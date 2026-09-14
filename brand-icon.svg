@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">
+  <!-- Brand favicon: the four-bar mark alone, on a TRANSPARENT ground.
+       Updated 2026-08-16 to the current logo (components/redesign/TfLogo.tsx).
+       Icon only, no wordmark - at 16px a lockup is an illegible smudge.
+
+       THE GROUND USED TO BE AN INK DISC, and dropping it costs the one thing
+       that disc bought: theme-proofing. Floating on the tab bar, the mark now
+       sits on whatever colour the browser paints, and the light palette's
+       bottom bar (#1F3D47) is nearly invisible on a dark one. So the palette
+       swaps on prefers-color-scheme below - the two warm bars are shared, and
+       only the cool pair lifts, exactly as the supplied dark artwork does.
+
+       This adaptation is the reason to care about icon.svg specifically:
+       favicon.ico cannot do it. That raster fallback therefore ships the
+       DARK-variant cools (#6FA0AE / #588096) unconditionally, because those
+       two are mid-tone enough to read on white AND on black, where the light
+       variant's navy is not. The two files differ on purpose.
+
+       SIZED TO 54 OF 80, leaving a margin so the mark is not flush to the
+       canvas edge. Worth knowing if it is ever retuned: with no disc to sit
+       inside, every unit of padding is a unit taken away from a mark that is
+       already at the edge of what survives a 16px render.
+
+       If the mark changes, change it here, in TfLogo.tsx and in
+       components/LogoMark.tsx together, then regenerate the rasters - the
+       command is in the header of components/LogoMark.tsx. -->
+  <style>
+    .tf-b1 { fill: #D69E54 }
+    .tf-b2 { fill: #C08850 }
+    .tf-b3 { fill: #3A6B70 }
+    .tf-b4 { fill: #1F3D47 }
+    @media (prefers-color-scheme: dark) {
+      .tf-b3 { fill: #6FA0AE }
+      .tf-b4 { fill: #588096 }
+    }
+  </style>
+  <g transform="translate(15.61 13) scale(0.43548)">
+    <rect class="tf-b1" x="0" y="0" width="46" height="19" rx="9.5" />
+    <rect class="tf-b2" x="0" y="35" width="79" height="19" rx="9.5" />
+    <rect class="tf-b3" x="0" y="70" width="112" height="19" rx="9.5" />
+    <rect class="tf-b4" x="0" y="105" width="72" height="19" rx="9.5" />
+  </g>
+</svg>

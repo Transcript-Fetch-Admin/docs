@@ -1,0 +1,109 @@
+---
+title: "Python SDK"
+---
+
+> **Official SDK.** Source + issues on [GitHub](https://github.com/TranscriptFetch/python-sdk). Your key falls back to the `TRANSCRIPTFETCH_API_KEY` env var, keep it server-side. One credit per successful caption fetch (AI audio transcription bills per started minute of audio); failed/blocked/no-transcript requests are free.
+
+## Install
+
+```bash
+pip install transcriptfetch-sdk
+```
+
+## Quickstart
+
+Get an API key (50 free credits a month) at [the dashboard](https://transcriptfetch.com/app), then:
+
+```python
+from transcriptfetch import TranscriptFetch
+
+# api_key falls back to the TRANSCRIPTFETCH_API_KEY env var
+tf = TranscriptFetch(api_key="tf_live_...")
+
+t = tf.transcripts.video("https://youtu.be/aircAruvnKk")
+print(t.title)
+for seg in t.segments:
+    print(f"[{seg.start:.1f}] {seg.text}")
+
+print("credits left:", t.usage.balance)
+```
+
+By default a transcript comes back as timestamped `segments` and has **no `text`**; the response carries exactly one of the two. To get one plain string instead, turn timestamps off:
+
+```python
+t = tf.transcripts.video("https://youtu.be/aircAruvnKk", timestamps=False)
+print(t.text)
+```
+
+## Endpoints
+
+`video`/`channel`/`playlist` accept URLs or raw IDs (normalized automatically).
+
+```python
+tf.transcripts.video(video, mode=, timestamps=, callback_url=)   # single transcript
+tf.transcripts.channel(channel, limit=, cursor=, since_video_id=)  # a channel's videos (metadata)
+tf.transcripts.playlist(playlist, limit=, cursor=)               # a playlist's videos
+tf.transcripts.search(query, limit=, cursor=)                    # search YouTube
+tf.transcripts.batch(video_ids)                                  # up to 50 transcripts in one call
+tf.transcripts.batch(video_ids, mode="captions")                 # captions only - no audio fallback
+# captionless entries come back status "processing" with a job_id: re-send the
+# batch later, or poll tf.transcripts.job(job_id)
+tf.health()                                                      # unauthenticated liveness probe
+```
+
+## Long media and jobs
+
+`mode="audio"`, or any captionless source that is not short, answers `202` with a job instead of a transcript: poll the job (or pass `callback_url=`) and read the result from there. Short captionless media usually still comes back inline in the same call. The full contract, including what AI transcription costs, is in the [transcription guide](/guides/transcription).
+
+## Pagination
+
+List endpoints are cursor-paginated. Iterate every result without managing cursors:
+
+```python
+# Iterate every result without managing cursors
+for video in tf.transcripts.iter_channel("@lexfridman", limit=10):
+    print(video.video_id, video.title)
+
+# ...or page manually via page.next_cursor and the cursor= argument.
+```
+
+## Async
+
+```python
+import asyncio
+from transcriptfetch import AsyncTranscriptFetch
+
+async def main():
+    async with AsyncTranscriptFetch() as tf:
+        t = await tf.transcripts.video("aircAruvnKk", timestamps=False)
+        print(t.text)
+        async for v in tf.transcripts.iter_search("how transformers work", limit=10):
+            print(v.title)
+
+asyncio.run(main())
+```
+
+## Errors
+
+All errors subclass `TranscriptFetchError`. API errors carry `.status`, `.code`, `.message`, and `.request_id`.
+
+```python
+from transcriptfetch import (
+    AuthenticationError, InsufficientCreditsError, InvalidRequestError,
+    RateLimitError, IdempotencyConflictError, UpstreamUnavailableError,
+    InternalServerError, APIError, APIConnectionError, APITimeoutError,
+)
+
+try:
+    tf.transcripts.video("bad")
+except InsufficientCreditsError:
+    ...                       # 402: top up at /pricing
+except RateLimitError as e:
+    print(e.retry_after)      # 429
+except APIError as e:
+    print(e.status, e.code, e.request_id)
+```
+
+> **Reliability built in.** Automatic retries on `429` (honoring `Retry-After`) and `5xx` with exponential backoff; every write auto-sends an `Idempotency-Key` so a retried request is never double-charged. Configure via `TranscriptFetch(api_key=..., base_url=..., timeout=30, max_retries=2)`.
+
+See the [endpoint reference](https://transcriptfetch.com/docs/endpoints) for every route and the [response format](https://transcriptfetch.com/docs/output).

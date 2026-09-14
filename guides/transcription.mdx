@@ -1,0 +1,154 @@
+---
+title: "Transcription and jobs"
+---
+
+## Choosing a mode
+
+The `mode` field on `POST /api/v2/transcripts/video` decides where the text may come from:
+
+| Mode | Behavior |
+| --- | --- |
+| `"auto"` (default) | Try the caption track first; when none exists, transcribe the audio. |
+| `"captions"` | Read an existing caption track only, and fail if there is none. The only way to guarantee a synchronous answer. |
+| `"audio"` | Skip the caption lookup entirely and transcribe the audio. |
+
+```http
+POST /api/v2/transcripts/video
+
+{ "video": "https://www.tiktok.com/@user/video/7137723462233555205", "mode": "audio" }
+```
+
+`ai_fallback: true` is the accepted legacy alias for `"mode": "audio"`; omitted or `false` means `"mode": "auto"`. Send one field or the other: a request carrying both `mode` and `ai_fallback` is rejected with `400 invalid_request`.
+
+> **Single-video only.** `mode: "audio"` and `ai_fallback` only mean something for one video. Sending `ai_fallback` to `/channel`, `/playlist` or `/search` returns `invalid_request`.
+
+## What happens when there are no captions
+
+The default path does not fail on a missing caption track; it escalates to AI transcription of the audio. That produces one of two outcomes:
+
+- **Short media comes back inline.** When the media is known to be 20 minutes or shorter (any platform), or it is on a short-form platform (TikTok, Instagram) whose duration could not be determined, the connection is held for up to about 45 seconds and the finished transcript is returned in the same response: a normal `200` with `data.kind: "transcript"`, an `ai_fallback` block with `engaged: true`, and the real charge in `usage.credits_spent`.
+- **Everything else gets a job.** The response is `202 Accepted` with a `job_id` and a `poll_url`. Nothing is charged at this point; credits are taken when the transcript is delivered.
+
+A failure envelope with a code like `no_captions` is only reachable with `mode: "captions"`, or when the input is something AI transcription can never serve.
+
+## The 202 job envelope
+
+An explicit `mode: "audio"` request that escalates to a job answers like this:
+
+```json
+{
+  "ok": true,
+  "request_id": "req_8f2c1a90b3d44e01",
+  "status": "processing",
+  "job_id": "asr_m3k1x9qz4vb2p7",
+  "poll_url": "/api/v2/transcripts/jobs/asr_m3k1x9qz4vb2p7",
+  "data": {
+    "kind": "transcript_job",
+    "video_id": "https://www.tiktok.com/@user/video/7137723462233555205",
+    "platform": "tiktok"
+  }
+}
+```
+
+A 202 produced by the auto path (a caption miss that escalated) reports `data.kind: "transcript"` with `text` and `segments` still `null` instead. Branch on `status` and the presence of `job_id`, never on the data kind or the HTTP code alone.
+
+## Polling the job
+
+`GET` the `poll_url` until `status` is no longer `processing`. A still-running job returns **200, not 202**, so branch on `status`, never on the HTTP code.
+
+```http
+GET /api/v2/transcripts/jobs/asr_m3k1x9qz4vb2p7
+```
+
+```json
+{ "ok": true, "request_id": "req_…", "status": "processing", "job_id": "asr_m3k1x9qz4vb2p7", "data": null }
+```
+
+When the job completes, the poll returns the full transcript. Credits live under `usage`, not at the top level:
+
+```json
+{
+  "ok": true,
+  "request_id": "req_…",
+  "status": "completed",
+  "job_id": "asr_m3k1x9qz4vb2p7",
+  "data": {
+    "kind": "transcript",
+    "video_id": "7137723462233555205",
+    "title": "How I make my espresso",
+    "text": "So the first thing people get wrong is the grind…",
+    "segments": [
+      { "start": 0.0, "duration": 4.1, "text": "So the first thing people get wrong is the grind" }
+    ]
+  },
+  "usage": { "credits_spent": 1, "balance": 96, "bytes": 4812031 }
+}
+```
+
+A completed job's `data` carries `kind`, `video_id`, `title`, and **both** `text` and `segments`. A failed job returns `ok: false`, `status: "failed"`, and an `error` object with `code` and `message`, still with HTTP 200.
+
+Worth knowing:
+
+- **Jobs are scoped to your account**, not to the key that created them; any of your keys can poll a job, and someone else's job id returns `404`.
+- **Polling is free.** It counts against your rate limit but never costs credits.
+- **Concurrent requests collapse.** Two requests for the same video while a job is live join the same job rather than starting a second one.
+- **Re-requesting a finished video is free.** A video that already went through AI transcription is served from cache, with a guard against charging twice.
+- **Delivery can fail on credits.** If your balance runs out between enqueue and completion, the job fails with `insufficient_credits`, but the result stays cached: top up and re-request to claim it.
+- **RapidAPI callers:** every poll is a metered gateway call against your plan, so prefer `callback_url` below. (The API also holds the connection longer for RapidAPI requests, about 90 seconds, precisely to spare you the poll.)
+
+## Webhooks instead of polling
+
+Pass `callback_url` (a public https URL) with the request and the finished result is POSTed to it:
+
+```json
+{
+  "ok": true,
+  "status": "completed",
+  "job_id": "asr_m3k1x9qz4vb2p7",
+  "data": {
+    "kind": "transcript",
+    "video_id": "7137723462233555205",
+    "title": "How I make my espresso",
+    "text": "So the first thing people get wrong is the grind…",
+    "segments": [ { "start": 0.0, "duration": 4.1, "text": "…" } ]
+  }
+}
+```
+
+A failed job posts `{ "ok": false, "status": "failed", "job_id": "…", "error": { "code": "…", "number": …, "message": "…", "docs": "…" } }`, the same error block as everywhere else.
+
+- The webhook body has **no `usage` and no `request_id`**; poll the job for those.
+- When a signing secret is configured, each delivery carries `X-TranscriptFetch-Signature: sha256=<hex>`, an HMAC-SHA256 of the **exact request body**. Verify it against the raw bytes before parsing.
+- Delivery is retried a few times on failure, and the job stays pollable either way, so a missed webhook is never a lost transcript.
+
+## What AI transcription costs
+
+Audio transcription is billed by length: **1 credit per started minute of audio, minimum 1 credit**. A short TikTok or Reel (up to 30 seconds) is 1 credit, a 10-minute video is 10, an hour is 60, and the ceiling at the 4-hour audio cap is 240. Caption fetches are always 1 credit regardless of length, and failures are always free.
+
+The completed job's `usage.credits_spent` reports what was actually charged; a 202 carries no `usage` because nothing has been charged yet.
+
+## When a retry would work: `retry_with`
+
+A transcript failure that a *different* request could serve says so in machine-readable form. The one case that matters: no caption track, and you sent `mode: "captions"` (or the input is one where the default path could not start transcription). The error then carries `retry_with`:
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "no_captions",
+    "number": 4103,
+    "message": "No caption track is available for this video.",
+    "docs": "https://transcriptfetch.com/docs/errors/no_captions",
+    "retry_with": { "mode": "audio" }
+  }
+}
+```
+
+Merge `retry_with` into your original body and send it again; that starts the transcription. When it is absent, a different request would not help: the content has no speech, cannot be reached, is on a platform audio transcription cannot serve, or the failure is transient (5xxx, retry the same request with backoff instead). `retry_with` is only present when the retry would actually be attempted, so it also reflects your balance: an audio transcription your credits cannot cover does not get offered.
+
+`retry_with` is also used by `endpoint_platform_mismatch` (3002), where it names the endpoint that serves the platform you sent, e.g. `{ "endpoint": "/api/v2/transcripts/video" }`.
+
+## Opting out
+
+If you never want to wait on a job, send `mode: "captions"`. The answer is guaranteed synchronous: either the caption track, or a `422` carrying the error code (and `retry_with` when transcription would work), at 0 credits.

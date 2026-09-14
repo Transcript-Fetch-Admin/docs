@@ -1,0 +1,41 @@
+---
+title: "Pagination and retries"
+---
+
+```http
+# Fetch the next page by echoing next_cursor back as cursor
+POST /api/v2/transcripts/search
+{ "query": "lex fridman", "limit": 10, "cursor": "eyJvIjoxMH0" }
+```
+
+Each page is one successful response and costs 1 credit, with one exception: **a page that comes back empty is free**. Cursors are opaque tokens; do not parse or construct them, and be prepared for a stored cursor to be rejected as malformed or expired. `next_cursor: null` is the only terminator.
+
+## Polling for new uploads with since_video_id
+
+List endpoints accept `since_video_id`: the newest video id you have already seen, as a bare id or a YouTube URL. The page is trimmed at that watermark, leaving exactly the videos newer than it, and when the marker is found on the page `next_cursor` is forced to `null` because everything past it is already seen.
+
+Combined with the empty-page rule this makes new-uploads polling free: ask for a channel's latest page with `since_video_id` set to the last video you processed, and every poll costs nothing until something new actually appears. When the marker is not on the page (a burst of uploads, or the video was deleted), the page is returned untrimmed rather than risking dropped videos.
+
+```http
+POST /api/v2/transcripts/channel
+{ "channel": "@veritasium", "since_video_id": "aircAruvnKk" }
+```
+
+## Idempotent retries
+
+Because requests are billed, retry safely by sending an `Idempotency-Key` header (any unique string, up to 255 chars). The first request runs and is charged; retries with the same key replay the stored response, same body, no extra charge, and carry an `Idempotent-Replayed: true` header. Replays are kept for 24 hours.
+
+```bash
+curl https://transcriptfetch.com/api/v2/transcripts/video \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: 9f1c-7b2e-...-a3" \
+  -d '{"video":"dQw4w9WgXcQ"}'
+```
+
+Two caveats:
+
+- **Only 2xx responses are replayed.** A transient failure (a 5xx, or a 402 you fixed by topping up) is not stored, so retrying the same key runs the request again, which is what you want.
+- **A replayed transcription request returns the stored `202`**, not the finished transcript. Poll the `job_id` from the replayed body (or use `callback_url`); see the [transcription guide](/guides/transcription).
+
+> **409 idempotency_conflict.** Reusing a key with a *different* body, or while the first request with that key is still in flight, returns `409 idempotency_conflict`.

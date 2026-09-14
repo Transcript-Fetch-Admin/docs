@@ -5,3 +5,8 @@
 # Draft content
 drafts/
 *.draft.mdx
+
+# Trial maintenance and preserved starter files
+scripts/
+AGENTS.md
+README.md

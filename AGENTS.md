@@ -1,33 +1,16 @@
-> **First-time setup**: Customize this file for your project. Prompt the user to customize this file for their project.
-> For Mintlify product knowledge (components, configuration, writing standards),
-> install the Mintlify skill: `npx skills add https://mintlify.com/docs`
+# TranscriptFetch Mintlify trial
 
-# Documentation project instructions
+This is an isolated, public documentation trial, not the production application.
 
-## About this project
-
-- This is a documentation site built on [Mintlify](https://mintlify.com)
-- Pages are MDX files with YAML frontmatter
-- Configuration lives in `docs.json`
-- Use the Mintlify MCP server, `https://mcp.mintlify.com`, to edit content and settings via MCP
-- Use the Mintlify docs MCP server, `https://www.mintlify.com/docs/mcp`, to query information about using Mintlify via MCP
-
-## Terminology
-
-{/* Add product-specific terms and preferred usage */}
-{/* Example: Use "workspace" not "project", "member" not "user" */}
-
-## Style preferences
-
-{/* Add any project-specific style rules below */}
-
-- Use active voice and second person ("you")
-- Keep sentences concise — one idea per sentence
-- Use sentence case for headings
-- Bold for UI elements: Click **Settings**
-- Code formatting for file names, commands, paths, and code references
-
-## Content boundaries
-
-{/* Define what should and shouldn't be documented */}
-{/* Example: Don't document internal admin features */}
+- Preserve all existing production docs and routing.
+- Keep changes in this repository. Never change root DNS or production /docs.
+- Only public content is allowed. Never include API keys or internal sources.
+- docs.json controls Mintlify branding and navigation.
+- Keep trial noindex, the banner, and links to canonical documentation.
+- Use the existing TranscriptFetch brand palette and Mintlify native components.
+- Keep headings sequential, code fenced, and links valid.
+- API reference is a snapshot of the public v2 OpenAPI document.
+- The playground stays simple/code-example-only until live requests are approved.
+- Starter content is preserved in drafts/starter and ignored.
+- Use sentence case, concise active prose, and no em dashes in new copy.
+- Validate MDX, config and links before pushing. Check desktop and mobile rendering.
