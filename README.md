@@ -1,6 +1,7 @@
 # TranscriptFetch Mintlify trial
 
-Isolated evaluation at https://transcriptfetch.mintlify.site.
+Isolated evaluation at https://transcript-fetch.mintlify.site/docs.
+The hyphen is significant: transcriptfetch.mintlify.site is a different starter site.
 This repository is public and must contain only public documentation and assets.
 
 ## Boundaries
