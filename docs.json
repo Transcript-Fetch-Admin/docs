@@ -19,8 +19,16 @@
     }
   },
   "fonts": {
-    "family": "Inter"
+    "heading": {
+      "family": "Switzer",
+      "weight": 400,
+      "source": "https://transcriptfetch.com/fonts/Switzer-Regular.woff2",
+      "format": "woff2"
+    },
+    "body": { "family": "Inter", "weight": 400 }
   },
+  "logo": "/logo/transcriptfetch.png",
+  "styling": { "codeblocks": "dark" },
   "favicon": "/brand-icon.svg",
   "navigation": {
     "tabs": [

@@ -20,6 +20,9 @@ Snapshot taken 2026-09-14:
   (work/backend at 9c285dae), with product placeholders resolved.
 - Public OpenAPI: https://transcriptfetch.com/api/v2/openapi.json
 - Favicon copied from the existing public brand asset.
+- Header logo rendered at 4x resolution directly from the existing TfLogo component.
+- Switzer headings use the existing public font; brand.css adapts native Mintlify
+  elements to the existing cream, amber, teal, and neutral design tokens.
 - Quickstart and introduction adapted for this trial.
 
 This is a snapshot, not automatic synchronization. Review against current docs

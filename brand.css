@@ -1,0 +1,78 @@
+/* TranscriptFetch token values mirrored from the existing design system.
+   Keep this adapter small: Mintlify owns layout and interaction behavior. */
+:root {
+  --tf-cream: #f8f7f5;
+  --tf-card: #ffffff;
+  --tf-ink: #1a1917;
+  --tf-muted: #57534d;
+  --tf-line: #e7e4e0;
+  --tf-action: #d69e54;
+  --tf-action-hover: #c08850;
+  --tf-brand: #3a6b70;
+  --tf-radius-card: 8px;
+  --tf-radius-code: 12px;
+}
+body, #background-color, #navbar, #sidebar, #mobile-nav-content {
+  background-color: var(--tf-cream) !important;
+}
+#page-title, #content h2, #content h3 {
+  font-weight: 400 !important;
+  letter-spacing: 0.01em;
+  color: var(--tf-ink);
+  text-wrap: balance;
+}
+#content strong, #content b { font-weight: 500; }
+#banner {
+  background-color: var(--tf-cream) !important;
+  color: var(--tf-muted) !important;
+  border-bottom: 1px solid var(--tf-line);
+}
+#banner a { color: var(--tf-brand) !important; }
+#navbar img[src*="transcriptfetch.png"] {
+  height: 44px !important;
+  width: auto !important;
+  max-width: 230px;
+  object-fit: contain;
+}
+@media (max-width: 640px) {
+  #navbar img[src*="transcriptfetch.png"] { height: 36px !important; max-width: 185px; }
+}
+#sidebar a[aria-current="page"] {
+  background-color: var(--tf-card) !important;
+  box-shadow: inset 3px 0 var(--tf-action);
+  color: var(--tf-ink) !important;
+  text-shadow: none;
+  border-radius: var(--tf-radius-card);
+}
+#topbar-cta-button a { min-height: 44px; padding-inline: 18px; }
+#topbar-cta-button a > span {
+  background-color: var(--tf-action) !important;
+  border-radius: 20px !important;
+}
+#topbar-cta-button a:hover > span { background-color: var(--tf-action-hover) !important; }
+#topbar-cta-button a div, #topbar-cta-button a div span,
+#topbar-cta-button a svg { color: var(--tf-ink) !important; }
+.card {
+  border-radius: var(--tf-radius-card) !important;
+  border-color: var(--tf-line) !important;
+  background-color: var(--tf-card) !important;
+  box-shadow: none !important;
+}
+.card:hover { border-color: var(--tf-brand) !important; }
+.callout[data-callout-type="note"], .callout[data-callout-type="info"] {
+  background-color: var(--tf-card) !important;
+  border-color: var(--tf-line) !important;
+  border-radius: var(--tf-radius-card) !important;
+  box-shadow: inset 3px 0 var(--tf-brand);
+}
+.callout:is([data-callout-type="note"], [data-callout-type="info"]) [data-component-part="callout-content"] {
+  color: var(--tf-muted) !important;
+}
+.callout:is([data-callout-type="note"], [data-callout-type="info"]) svg {
+  color: var(--tf-brand) !important;
+}
+.code-block, .code-group { border-radius: var(--tf-radius-code) !important; }
+:is(a, button, input, textarea):focus-visible {
+  outline: 2px solid var(--tf-brand);
+  outline-offset: 3px;
+}
