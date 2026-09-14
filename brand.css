@@ -27,6 +27,7 @@ body, #background-color, #navbar, #sidebar, #mobile-nav-content {
   color: var(--tf-muted) !important;
   border-bottom: 1px solid var(--tf-line);
 }
+#banner * { color: var(--tf-muted) !important; }
 #banner a { color: var(--tf-brand) !important; }
 #navbar img[src*="transcriptfetch.png"] {
   height: 44px !important;
