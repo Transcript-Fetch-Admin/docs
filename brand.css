@@ -9,6 +9,8 @@
   --tf-action: #d69e54;
   --tf-action-hover: #c08850;
   --tf-brand: #3a6b70;
+  --tf-dark: #1b1917;
+  --tf-light: #f8f7f5;
   --tf-radius-card: 8px;
   --tf-radius-code: 12px;
 }
@@ -27,8 +29,11 @@ body, #background-color, #navbar, #sidebar, #mobile-nav-content {
   color: var(--tf-muted) !important;
   border-bottom: 1px solid var(--tf-line);
 }
-#banner * { color: var(--tf-muted) !important; }
-#banner a { color: var(--tf-brand) !important; }
+/* Native banner utilities are !important inside Tailwind's layers. */
+@layer base {
+  #banner * { color: var(--tf-muted) !important; }
+  #banner a { color: var(--tf-brand) !important; }
+}
 #navbar img[src*="transcriptfetch.png"] {
   height: 44px !important;
   width: auto !important;
@@ -73,6 +78,20 @@ body, #background-color, #navbar, #sidebar, #mobile-nav-content {
   color: var(--tf-brand) !important;
 }
 .code-block, .code-group { border-radius: var(--tf-radius-code) !important; }
+.code-block { background-color: var(--tf-dark) !important; color: var(--tf-light); }
+.code-block-fade-overlay {
+  --fade-color-light: var(--tf-dark) !important;
+  --fade-color-dark: var(--tf-dark) !important;
+}
+.code-block [data-component-part="code-block-root"] {
+  background-color: var(--tf-dark) !important;
+  border-radius: var(--tf-radius-code) !important;
+}
+.code-block pre.shiki {
+  background-color: var(--tf-dark) !important;
+  color: var(--shiki-dark, var(--tf-light)) !important;
+}
+.code-block pre.shiki span { color: var(--shiki-dark, inherit) !important; }
 :is(a, button, input, textarea):focus-visible {
   outline: 2px solid var(--tf-brand);
   outline-offset: 3px;
