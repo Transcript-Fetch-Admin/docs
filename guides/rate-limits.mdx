@@ -1,0 +1,40 @@
+---
+title: "Rate limits"
+description: "Requests are rate limited per key. The default is 60 requests per minute; a custom limit can be set on a key. Every response carries the current limit state."
+---
+
+HTTP
+
+```text
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 58
+X-RateLimit-Reset: 1717619400
+```
+
+Limits are applied per **API key** (dashboard and session calls are limited per user) over a **sliding 60-second window**. The default is 60 requests per minute; a custom limit can be set on individual keys, and higher limits are available on request via [support](https://transcriptfetch.com/contact).
+
+When you exceed the limit you get `429 Too Many Requests`. The wait time comes from the `Retry-After` **header** (seconds), and the body is the standard error envelope:
+
+HTTP
+
+```text
+HTTP/1.1 429 Too Many Requests
+Retry-After: 12
+
+{
+  "ok": false,
+  "request_id": "req_8f2c1a90b3d44e01",
+  "error": {
+    "code": "rate_limited",
+    "number": 2101,
+    "message": "Too many requests. Slow down and retry.",
+    "docs": "https://transcriptfetch.com/docs/errors/rate_limited"
+  }
+}
+```
+
+A `429` never consumes credits.
+
+A `429` always means your own key's limit — nothing else. When the upstream platform blocks or fails a fetch, the API answers `503` with code `upstream_error` (5001) instead; that is transient, so retry with backoff.
+
+**Honor Retry-After.** When you hit a `429`, wait the number of seconds in the `Retry-After` header before retrying rather than hammering the endpoint immediately.

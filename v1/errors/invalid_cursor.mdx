@@ -1,0 +1,51 @@
+---
+title: "v1: invalid_cursor · HTTP 400"
+description: "The pagination cursor is malformed or expired. Restart the listing without a cursor."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "invalid_request",
+    "message": "The pagination cursor is malformed or expired. Restart the listing without a cursor."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint. **v1 never emits this code**; it answers `invalid_request` for this situation.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The pagination cursor is malformed or expired. Restart the listing without a cursor.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The `cursor` value was edited, truncated, or taken from a different listing.
+- The cursor outlived the listing it belonged to.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Pass `next_cursor` back exactly as received, on the same endpoint with the same input.
+- Restart the listing without a cursor to get a fresh first page.
+
+**Retryable?** Only without the cursor, or with a fresh one from a new first page. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [invalid_request](/v1/errors/invalid_request) (1001), any other malformed field in the same body

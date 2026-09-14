@@ -25,12 +25,30 @@ Snapshot taken 2026-09-14:
   elements to the existing cream, amber, teal, and neutral design tokens.
 - Quickstart and introduction adapted for this trial.
 
+## Coverage
+
+The trial includes all 13 static public `/docs` routes, all 33 public error
+detail pages, and the version-specific v1 quickstart, output, errors and endpoint
+reference. Both OpenAPI snapshots expose all eight public operations. The
+published custom-doc inventory contained zero rows at export time.
+
+`migration-coverage.json` records source routes, versions, and trial destinations.
+Generated response examples and the supported-source table are included, not
+left as placeholder blocks. Original section anchors are retained for deep links.
+Standalone authentication and API-key pages remain retired; quickstart contains
+their essential instructions.
+
+The interactive request builder is linked to the canonical application rather
+than reproduced. API playground requests remain disabled in this trial. The MCP
+guide's blanket one-credit sentence was corrected in the trial to distinguish
+duration-billed transcription; the original application was not edited.
+
 This is a snapshot, not automatic synchronization. Review against current docs
 before relying on it as a maintained reference. The canonical site remains
 https://transcriptfetch.com/docs.
 
 ## Validate
 
-Run `npx mint validate` and `npx mint broken-links`.
+Run `node scripts/check-coverage.mjs`, `npx mint validate`, and `npx mint broken-links`.
 Pushes to main trigger only this Mintlify trial. Do not connect the application
 repository or configure the production hostname during the trial.

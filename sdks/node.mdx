@@ -1,24 +1,33 @@
 ---
-title: "Node.js SDK"
+title: "Node SDK"
+description: "The official, typed Node.js / TypeScript client. Fetch transcripts, channels, playlists, and search as structured data, ESM + CommonJS, zero runtime dependencies."
 ---
 
-> **Official SDK.** Source + issues on [GitHub](https://github.com/TranscriptFetch/node-sdk). Your key falls back to the `TRANSCRIPTFETCH_API_KEY` env var, keep it server-side. One credit per successful caption fetch (AI audio transcription bills per started minute of audio); failed/blocked/no-transcript requests are free.
+**Official SDK.** Source + issues on [GitHub](https://github.com/TranscriptFetch/node-sdk). Your key falls back to the `TRANSCRIPTFETCH_API_KEY` env var, keep it server-side. One credit per successful caption fetch (AI audio transcription bills per started minute of audio); failed/blocked/no-transcript requests are free.
 
-> **Using n8n?** There is a community node that wraps this API for n8n workflows, no code required: [n8n-nodes-transcriptfetch](https://www.npmjs.com/package/n8n-nodes-transcriptfetch).
+**Using n8n?** There is a community node that wraps this API for n8n workflows, no code required: [n8n-nodes-transcriptfetch](https://www.npmjs.com/package/n8n-nodes-transcriptfetch).
+
+<a id="sec-install" />
 
 ## Install
 
-```bash
+BASH
+
+```text
 npm install transcriptfetch
 ```
 
 Requires Node 18+ (uses the built-in `fetch`). Ships types for TypeScript.
 
+<a id="sec-quickstart" />
+
 ## Quickstart
 
 Get an API key (50 free credits a month) at [the dashboard](https://transcriptfetch.com/app), then:
 
-```typescript
+TYPESCRIPT
+
+```text
 import { TranscriptFetch } from "transcriptfetch";
 
 // apiKey falls back to the TRANSCRIPTFETCH_API_KEY env var
@@ -35,16 +44,22 @@ console.log("credits left:", t.usage?.balance);
 
 By default a transcript comes back as timestamped `segments` and has **no `text`**; the response carries exactly one of the two. To get one plain string instead, turn timestamps off:
 
-```typescript
+TYPESCRIPT
+
+```text
 const plain = await tf.transcripts.video("https://youtu.be/aircAruvnKk", { timestamps: false });
 console.log(plain.text);
 ```
+
+<a id="sec-endpoints" />
 
 ## Endpoints
 
 `video`/`channel`/`playlist` accept URLs or raw IDs (normalized automatically).
 
-```typescript
+TYPESCRIPT
+
+```text
 await tf.transcripts.video(video, { mode, timestamps, callbackUrl });     // single transcript
 await tf.transcripts.channel(channel, { limit, cursor, sinceVideoId });   // a channel's videos (metadata)
 await tf.transcripts.playlist(playlist, { limit, cursor });               // a playlist's videos
@@ -56,15 +71,21 @@ await tf.transcripts.batch(videoIds, { mode: "captions" });               // cap
 await tf.health();                                                        // unauthenticated liveness probe
 ```
 
+<a id="sec-long-media-and-jobs" />
+
 ## Long media and jobs
 
 `mode: "audio"`, or any captionless source that is not short, answers `202` with a job instead of a transcript: poll the job (or pass `callbackUrl`) and read the result from there. Short captionless media usually still comes back inline in the same call. The full contract, including what AI transcription costs, is in the [transcription guide](/guides/transcription).
+
+<a id="sec-pagination" />
 
 ## Pagination
 
 List endpoints are cursor-paginated. Iterate every result with an async generator:
 
-```typescript
+TYPESCRIPT
+
+```text
 // Iterate every result without managing cursors
 for await (const video of tf.transcripts.iterChannel("@lexfridman", { limit: 10 })) {
   console.log(video.videoId, video.title);
@@ -73,11 +94,15 @@ for await (const video of tf.transcripts.iterChannel("@lexfridman", { limit: 10 
 // ...or page manually via page.nextCursor and the cursor option.
 ```
 
+<a id="sec-errors" />
+
 ## Errors
 
 All errors subclass `TranscriptFetchError`. API errors carry `.status`, `.code`, `.message`, and `.requestId`.
 
-```typescript
+TYPESCRIPT
+
+```text
 import {
   InsufficientCreditsError, RateLimitError, APIError,
 } from "transcriptfetch";
@@ -95,6 +120,6 @@ try {
 }
 ```
 
-> **Reliability built in.** Automatic retries on `429` (honoring `Retry-After`) and `5xx` with exponential backoff; every write auto-sends an `Idempotency-Key` so a retried request is never double-charged. Configure via `new TranscriptFetch({ apiKey, baseUrl, timeout: 30000, maxRetries: 2 })`.
+**Reliability built in.** Automatic retries on `429` (honoring `Retry-After`) and `5xx` with exponential backoff; every write auto-sends an `Idempotency-Key` so a retried request is never double-charged. Configure via `new TranscriptFetch({ apiKey, baseUrl, timeout: 30000, maxRetries: 2 })`.
 
-Prefer raw HTTP? The API is plain HTTPS/JSON, see the [endpoint reference](https://transcriptfetch.com/docs/endpoints) for every route and the [response format](https://transcriptfetch.com/docs/output).
+Prefer raw HTTP? The API is plain HTTPS/JSON, see the [endpoint reference](/reference/endpoints) for every route and the [response format](/reference/output).

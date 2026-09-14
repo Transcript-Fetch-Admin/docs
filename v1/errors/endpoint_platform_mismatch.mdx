@@ -1,0 +1,50 @@
+---
+title: "v1: endpoint_platform_mismatch · HTTP 422"
+description: "The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles)."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "unsupported_platform",
+    "message": "The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles)."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint. **v1 never emits this code**; it answers `unsupported_platform` for this situation.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles).
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- An Instagram profile URL was sent to `/transcripts/playlist`. Playlists exist publicly on YouTube and TikTok only.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Send the profile URL to `/transcripts/channel` instead; `error.retry_with.endpoint` names it.
+- Use `/transcripts/playlist` for YouTube and TikTok playlist URLs.
+
+**Retryable?** Only on the endpoint named in `retry_with`. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/v1/errors/unsupported_platform) (3001), a platform no endpoint serves at all

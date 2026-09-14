@@ -1,0 +1,93 @@
+---
+title: "MCP server for YouTube, TikTok & Instagram"
+description: "Point any MCP-compatible AI client at TranscriptFetch so your assistant can fetch transcripts from YouTube, TikTok, Instagram and direct media files, and discover videos, mid-conversation."
+---
+
+New here? The [MCP server overview](https://transcriptfetch.com/mcp-server) covers what it does, per-client setup, and pricing. This page is the configuration reference. The server advertises five tools:
+
+Remote MCP endpoint: `https://transcriptfetch.com/mcp`. Supports OAuth and API keys.
+
+## Available tools
+
+### get_transcript
+
+Full transcript for a YouTube ID/URL, TikTok, Instagram, or direct media file. Pass `ai_fallback: true` to transcribe audio when captions are unavailable.
+
+### search_videos
+
+Search YouTube by keyword; returns titles, IDs, and URLs.
+
+### list_channel_videos
+
+Recent videos for a handle (`@name`), channel ID (`UC…`), or URL.
+
+### list_playlist_videos
+
+Videos in a playlist ID or URL.
+
+### get_credits
+
+The caller’s remaining credit balance. The only free tool.
+
+Delivered caption transcripts and successful listing calls cost one credit. AI transcription is billed by audio duration; `get_credits` is free. See [Billing and credits](/guides/billing). When a video has no captions, `get_transcript` starts AI transcription and, for short videos, waits inline and returns the finished text in the same call (typically ~30 seconds). Longer media returns `outcome: "processing"` with a `jobId`; the client calls the tool again with the same video to collect the finished text. When the job is not started automatically, the response says whether retrying with `ai_fallback: true` would work.
+
+<a id="claude-web" />
+
+## Claude (web), one-click connector
+
+**The fastest way to connect.** Claude.ai handles authentication over OAuth, so no API key is needed. Sign in to TranscriptFetch and approve access. Requires a paid Claude plan.
+
+[Connect in Claude](https://claude.ai/customize/connectors?modal=add-custom-connector&connectorName=TranscriptFetch&connectorUrl=https%3A%2F%2Ftranscriptfetch.com%2Fmcp)
+
+1. Use **Connect in Claude** above. The dialog opens with the name and server URL already filled in. Or configure it manually: **Settings → Connectors** → **“Add custom connector”**, name **TranscriptFetch**, server URL `https://transcriptfetch.com/mcp`.
+2. Click **“Connect”**. You’re taken to TranscriptFetch’s sign-in / authorization page, sign in (or create an account) and approve access.
+3. Acknowledge that Claude will use your TranscriptFetch credits: one per delivered caption transcript, or duration-based credits for AI transcription.
+4. Done. All five tools (`get_transcript`, `search_videos`, `list_channel_videos`, `list_playlist_videos`, `get_credits`) are now available. Paste a video URL from YouTube, TikTok, or Instagram and ask for the transcript.
+
+<a id="claude-code-desktop" />
+
+## Claude Code / Desktop, API key
+
+For Claude Code, add the server with your API key as a bearer header:
+
+```bash
+claude mcp add --transport http transcriptfetch https://transcriptfetch.com/mcp \
+  --header "Authorization: Bearer tf_live_YOUR_KEY"
+```
+
+For Claude Desktop, bridge the HTTP server with `mcp-remote` in your `claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "transcriptfetch": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://transcriptfetch.com/mcp",
+        "--header",
+        "Authorization: Bearer tf_live_YOUR_KEY"
+      ]
+    }
+  }
+}
+```
+
+<a id="cursor-vscode" />
+
+## Cursor / VS Code, API key
+
+Add an entry to your MCP config (Cursor: `~/.cursor/mcp.json`, VS Code: `.vscode/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "transcriptfetch": {
+      "url": "https://transcriptfetch.com/mcp",
+      "headers": {
+        "Authorization": "Bearer tf_live_YOUR_KEY"
+      }
+    }
+  }
+}
+```

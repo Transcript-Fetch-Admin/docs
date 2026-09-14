@@ -1,0 +1,53 @@
+---
+title: "v1: region_blocked · HTTP 422"
+description: "The video is geo-restricted for the fetch region."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "reason": "region_blocked",
+  "error": {
+    "code": "region_blocked",
+    "message": "The video is geo-restricted for the fetch region."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Region blocked.** The video is geo-restricted for the fetch region.
+
+Shown to end users as: “This video appears to be region-restricted.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Region blocked. The video is geo-restricted for the fetch region.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: the content itself is not accessible to fetch.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/v1/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

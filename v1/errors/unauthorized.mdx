@@ -1,0 +1,54 @@
+---
+title: "v1: unauthorized · HTTP 401"
+description: "Missing or invalid API key."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "unauthorized",
+    "message": "Missing or invalid API key."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+Missing or invalid API key.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The Authorization header is missing or not in the form `Bearer tf_live_...`.
+- The API key was revoked in the dashboard, or has a typo.
+- The key was pasted with surrounding whitespace or quotes.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Send the key as `Authorization: Bearer tf_live_...` on every request.
+- Check the key's status at transcriptfetch.com/app/keys; revoked keys never work again, so create a fresh one if needed.
+- Verify the key with a free call to GET /api/v2/me; it returns your credit balance when the key is valid.
+
+**Retryable?** No, retrying with the same key will keep failing. Fix the credential first. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [invalid_request](/v1/errors/invalid_request) (1001), the request was readable but malformed, rather than unauthenticated
+- [insufficient_credits](/v1/errors/insufficient_credits) (2001), the key is valid but the account cannot pay for the call

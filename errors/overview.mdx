@@ -1,0 +1,107 @@
+---
+title: "Error codes & outcomes"
+description: "Request-level failures return a canonical error object with a machine-readable code. Per-video results inside a batch carry an outcome instead, and only successful ones are billed."
+---
+
+Fix the request
+
+400 · 401 · 402 · 404 · 409 · 422
+
+Change the input, credentials, credits, or request state before sending it again.
+
+Retry with backoff
+
+429 · 5xx
+
+Retry transient failures. For 429, wait for the Retry-After value first.
+
+Inspect each item
+
+Batch HTTP 200
+
+A successful batch can contain mixed outcomes. Only items marked ok are billed.
+
+<a id="request-errors" />
+
+## Request errors
+
+Every failure carries `error.code` (a stable string) and `error.number` (a stable integer whose thousands digit is the family: 1 request, 2 account, 3 input, 4 content, 5 transient, 9 ours). Branch on either; 5xxx means retry with backoff. Select a code for its response shape and recovery guidance. A number works as a URL too: `/docs/errors/4103`.
+
+| code | # | HTTP | Meaning |
+| --- | --- | --- | --- |
+| [`invalid_request`](/errors/invalid_request) | 1001 | 400 | The body failed validation. error.issues names each field and constraint. |
+| [`invalid_cursor`](/errors/invalid_cursor) | 1002 | 400 | The pagination cursor is malformed or expired. Restart the listing without a cursor. |
+| [`unauthorized`](/errors/unauthorized) | 1101 | 401 | Missing or invalid API key. |
+| [`idempotency_conflict`](/errors/idempotency_conflict) | 1201 | 409 | Idempotency-Key reused with a different body, or a request with that key is still in flight. |
+| [`not_found`](/errors/not_found) | 1301 | 404 | No such resource for this account - an unknown job id, or a job that belongs to someone else. |
+| [`insufficient_credits`](/errors/insufficient_credits) | 2001 | 402 | Not enough credits for the request. Nothing was charged; retry once credits are available. |
+| [`batch_too_large`](/errors/batch_too_large) | 2002 | 400 | The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent. |
+| [`rate_limited`](/errors/rate_limited) | 2101 | 429 | Your key's per-plan request rate was exceeded. Wait Retry-After seconds, then continue. |
+| [`unsupported_platform`](/errors/unsupported_platform) | 3001 | 422 | The input is not on a platform we serve. Transcripts cover YouTube, TikTok, Instagram and direct media files. |
+| [`endpoint_platform_mismatch`](/errors/endpoint_platform_mismatch) | 3002 | 422 | The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles). |
+| [`audio_ineligible`](/errors/audio_ineligible) | 3004 | 422 | Audio transcription cannot run on this input, so mode: "audio" (or ai_fallback) has nothing to work on. |
+| [`upstream_unavailable`](/errors/upstream_unavailable) | 5101 | 502 | The transcript service could not be reached. Safe to retry. |
+| [`internal_error`](/errors/internal_error) | 9001 | 500 | Unexpected server error. Retry with backoff; if it persists, send support the request_id. |
+
+<a id="batch-outcomes" />
+
+## Per-video outcomes
+
+Batch requests return one outcome per video, even when the overall request succeeds.
+
+| outcome | Charged | Meaning |
+| --- | --- | --- |
+| `ok` | 1 credit | Transcript (or video list) returned successfully. |
+| `no_transcript` | Free | The video exists but has no available transcript/captions. |
+| `processing` | Free on this call | No caption track existed, so audio transcription started (batch default). The entry carries job_id and poll_url; billed on delivery at the audio rate. |
+| `error` | Free | The fetch failed. Transient failures are worth retrying with backoff. |
+
+**A 200 can still carry a non-success outcome.** Only `ok` items are billed. Inspect every item instead of treating the batch status as the result.
+
+<a id="transcript-reasons" />
+
+## Transcript failure reasons
+
+A failed fetch reports which of these as `error.code`. A 422 is permanent for that input; a 503 is transient unless noted. When AI transcription of the audio would still work, the error carries `retry_with`.
+
+| code | # | HTTP | What it means | Retry? |
+| --- | --- | --- | --- | --- |
+| [`live_stream`](/errors/live_stream) | 4101 | 422 | The video is a live stream: broadcasting now, scheduled, or ended without a published recording. Live streams are not supported; retrying will not help until YouTube publishes a recording (24/7 streams never get one). | No |
+| [`was_live`](/errors/was_live) | 4102 | 422 | The video was a live broadcast and has no caption track. | No |
+| [`no_audio_stream`](/errors/no_audio_stream) | 4106 | 422 | The downloaded media carried no audio stream, so it could not be transcribed. Distinct from no_speech, which means audio exists but carries no speech. PERMANENT on purpose: retrying re-runs the same conversion on the same bytes and fails identically. | No |
+| [`audio_too_long`](/errors/audio_too_long) | 3006 | 422 | The media is longer than this account can transcribe in one request - either past the AI-transcription length limit, or past what the remaining credit balance covers. No audio was downloaded, so nothing was charged. Distinct from no_speech, which means audio WAS transcribed and carried no speech. Retrying the same media changes nothing; the response's message says which limit applied. | No |
+| [`no_speech`](/errors/no_speech) | 4105 | 422 | No detectable speech (e.g. music/ambient); nothing to transcribe. | No |
+| [`captions_disabled`](/errors/captions_disabled) | 4104 | 422 | Captions are disabled by the uploader. | No |
+| [`no_captions`](/errors/no_captions) | 4103 | 422 | No caption track (manual or auto-generated) is available. | No |
+| [`age_restricted`](/errors/age_restricted) | 4004 | 422 | The video is age-restricted and not accessible without sign-in. | No |
+| [`members_only`](/errors/members_only) | 4003 | 422 | The video is members-only / requires a channel membership. | No |
+| [`private`](/errors/private) | 4001 | 422 | The video is private. | No |
+| [`unavailable`](/errors/unavailable) | 4002 | 422 | The video is unavailable (deleted, removed, terminated, or region-blocked). | No |
+| [`region_blocked`](/errors/region_blocked) | 4005 | 422 | The video is geo-restricted for the fetch region. | No |
+| [`timeout`](/errors/timeout) | 5002 | 503 | Upstream fetch timed out. Transient, retry. | Yes, with backoff |
+| [`upstream_error`](/errors/upstream_error) | 5001 | 503 | The upstream fetch failed with a server-side error. Transient, retry. | Yes, with backoff |
+| [`proxy_unavailable`](/errors/proxy_unavailable) | 5004 | 503 | The upstream egress proxy refused the tunnel (billing, credentials, or exhausted quota). NOT retryable - retrying cannot clear it, and every platform is affected until it is resolved. | No, wait for us |
+| [`connection`](/errors/connection) | 5003 | 503 | Could not connect to the upstream service. Transient, retry. | Yes, with backoff |
+| [`parse_error`](/errors/parse_error) | 5005 | 503 | Upstream returned a response that couldn't be parsed. | Yes, with backoff |
+| [`invalid_input`](/errors/invalid_input) | 3005 | 422 | The provided video/URL/ID was invalid. | No |
+| [`drm_protected`](/errors/drm_protected) | 3007 | 422 | The source is DRM-protected and cannot be downloaded. Spotify and Apple Podcasts pages fall here; podcast links are not supported. | No |
+| [`unknown`](/errors/unknown) | 9002 | 503 | The fetch failed for an unspecified reason. | Yes, with backoff |
+
+<a id="http-statuses" />
+
+## HTTP status guide
+
+Use the status to choose the broad response, then the error or reason code for the exact cause.
+
+| Status | Name | Meaning |
+| --- | --- | --- |
+| 400 | Bad Request | Invalid body, bad value, limit out of range, stale cursor, or a batch over your plan's cap. Read error.code and error.issues / error.details. |
+| 401 | Unauthorized | Missing, malformed, revoked, or unknown API key. |
+| 402 | Payment Required | Not enough credits to complete the request. Top up or upgrade your plan. |
+| 404 | Not Found | The requested transcription job does not exist or belongs to another account. |
+| 409 | Conflict | Idempotency-Key reused with a different body, or a request with that key is still in flight. |
+| 422 | Unprocessable Entity | Permanent failure for this input (unsupported platform, no captions, private, live, DRM-protected). error.code says which. The same input will fail the same way, so do not retry unchanged. |
+| 429 | Too Many Requests | Rate limited: always your own key's per-plan limit. Honor the Retry-After header. (An upstream platform failing or blocking a fetch answers 503, never 429.) |
+| 500 | Internal Server Error | Unexpected server error. Retry with backoff; if it persists, send support the request_id. |
+| 502 | Bad Gateway | The transcript service was unreachable. Safe to retry with backoff. |
+| 503 | Service Unavailable | Transient failure. Safe to retry with backoff; error.code says what failed. |

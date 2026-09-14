@@ -25,10 +25,15 @@
       "source": "https://transcriptfetch.com/fonts/Switzer-Regular.woff2",
       "format": "woff2"
     },
-    "body": { "family": "Inter", "weight": 400 }
+    "body": {
+      "family": "Inter",
+      "weight": 400
+    }
   },
   "logo": "/logo/transcriptfetch.png",
-  "styling": { "codeblocks": "dark" },
+  "styling": {
+    "codeblocks": "dark"
+  },
   "favicon": "/brand-icon.svg",
   "navigation": {
     "tabs": [
@@ -39,28 +44,198 @@
             "group": "Start here",
             "pages": [
               "index",
-              "quickstart"
+              "quickstart",
+              "request-builder"
             ]
           },
           {
             "group": "Working with transcripts",
             "pages": [
+              "guides/sources",
               "guides/transcription",
-              "guides/pagination"
+              "guides/pagination",
+              "reference/output"
             ]
           },
           {
-            "group": "SDKs",
+            "group": "SDKs and integrations",
             "pages": [
               "sdks/python",
-              "sdks/node"
+              "sdks/node",
+              "sdks/mcp"
+            ]
+          },
+          {
+            "group": "Limits and billing",
+            "pages": [
+              "guides/rate-limits",
+              "guides/billing"
             ]
           }
         ]
       },
       {
         "tab": "API reference",
-        "openapi": "openapi.json"
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "reference/endpoints"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "api-reference/video",
+              "api-reference/channel",
+              "api-reference/playlist",
+              "api-reference/search",
+              "api-reference/job-status",
+              "api-reference/batch",
+              "api-reference/me",
+              "api-reference/health"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Troubleshooting",
+        "groups": [
+          {
+            "group": "Errors and outcomes",
+            "pages": [
+              "errors/overview",
+              {
+                "group": "Request and account",
+                "pages": [
+                  "errors/invalid_request",
+                  "errors/invalid_cursor",
+                  "errors/unauthorized",
+                  "errors/idempotency_conflict",
+                  "errors/not_found",
+                  "errors/insufficient_credits",
+                  "errors/batch_too_large",
+                  "errors/rate_limited"
+                ]
+              },
+              {
+                "group": "Input and media",
+                "pages": [
+                  "errors/unsupported_platform",
+                  "errors/endpoint_platform_mismatch",
+                  "errors/audio_ineligible",
+                  "errors/invalid_input",
+                  "errors/audio_too_long",
+                  "errors/drm_protected",
+                  "errors/private",
+                  "errors/unavailable",
+                  "errors/members_only",
+                  "errors/age_restricted",
+                  "errors/region_blocked",
+                  "errors/live_stream",
+                  "errors/was_live",
+                  "errors/no_captions",
+                  "errors/captions_disabled",
+                  "errors/no_speech",
+                  "errors/no_audio_stream"
+                ]
+              },
+              {
+                "group": "Transient and service",
+                "pages": [
+                  "errors/upstream_error",
+                  "errors/timeout",
+                  "errors/connection",
+                  "errors/proxy_unavailable",
+                  "errors/parse_error",
+                  "errors/upstream_unavailable",
+                  "errors/internal_error",
+                  "errors/unknown"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Legacy v1",
+        "groups": [
+          {
+            "group": "Legacy reference",
+            "pages": [
+              "v1/quickstart",
+              "v1/reference/output",
+              "v1/reference/endpoints"
+            ]
+          },
+          {
+            "group": "Endpoints",
+            "pages": [
+              "v1/api-reference/video",
+              "v1/api-reference/channel",
+              "v1/api-reference/playlist",
+              "v1/api-reference/search",
+              "v1/api-reference/job-status",
+              "v1/api-reference/batch",
+              "v1/api-reference/me",
+              "v1/api-reference/health"
+            ]
+          },
+          {
+            "group": "Errors",
+            "pages": [
+              "v1/errors/overview",
+              {
+                "group": "Request and account",
+                "pages": [
+                  "v1/errors/invalid_request",
+                  "v1/errors/invalid_cursor",
+                  "v1/errors/unauthorized",
+                  "v1/errors/idempotency_conflict",
+                  "v1/errors/not_found",
+                  "v1/errors/insufficient_credits",
+                  "v1/errors/batch_too_large",
+                  "v1/errors/rate_limited"
+                ]
+              },
+              {
+                "group": "Input and media",
+                "pages": [
+                  "v1/errors/unsupported_platform",
+                  "v1/errors/endpoint_platform_mismatch",
+                  "v1/errors/audio_ineligible",
+                  "v1/errors/invalid_input",
+                  "v1/errors/audio_too_long",
+                  "v1/errors/drm_protected",
+                  "v1/errors/private",
+                  "v1/errors/unavailable",
+                  "v1/errors/members_only",
+                  "v1/errors/age_restricted",
+                  "v1/errors/region_blocked",
+                  "v1/errors/live_stream",
+                  "v1/errors/was_live",
+                  "v1/errors/no_captions",
+                  "v1/errors/captions_disabled",
+                  "v1/errors/no_speech",
+                  "v1/errors/no_audio_stream"
+                ]
+              },
+              {
+                "group": "Transient and service",
+                "pages": [
+                  "v1/errors/upstream_error",
+                  "v1/errors/timeout",
+                  "v1/errors/connection",
+                  "v1/errors/proxy_unavailable",
+                  "v1/errors/parse_error",
+                  "v1/errors/upstream_unavailable",
+                  "v1/errors/internal_error",
+                  "v1/errors/unknown"
+                ]
+              }
+            ]
+          }
+        ]
       }
     ]
   },

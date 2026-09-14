@@ -1,0 +1,52 @@
+---
+title: "upstream_unavailable · 5101 · HTTP 502"
+description: "The transcript service could not be reached. Safe to retry."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "upstream_unavailable",
+    "number": 5101,
+    "message": "The transcript service could not be reached. Safe to retry.",
+    "docs": "https://transcriptfetch.com/docs/errors/upstream_unavailable"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `5xxx · transient, retry with backoff`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The transcript service could not be reached. Safe to retry.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The transcript service behind the API was briefly unreachable.
+- The idempotency store was unavailable, so a request with an Idempotency-Key was refused rather than risk double-billing (HTTP 503 in that case).
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Retry with exponential backoff; these are transient by nature.
+- Check status at status.transcriptfetch.com if failures persist.
+
+**Retryable?** Yes, safe to retry; failed requests are never charged. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [upstream_error](/errors/upstream_error) (5001), the fetch itself failed at the source platform (503)
+- [internal_error](/errors/internal_error) (9001), a fault in request processing rather than in the fetch

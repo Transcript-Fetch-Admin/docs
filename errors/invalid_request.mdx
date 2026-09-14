@@ -1,0 +1,63 @@
+---
+title: "invalid_request · 1001 · HTTP 400"
+description: "The body failed validation. error.issues names each field and constraint."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "invalid_request",
+    "number": 1001,
+    "message": "The body failed validation. error.issues names each field and constraint.",
+    "docs": "https://transcriptfetch.com/docs/errors/invalid_request",
+    "issues": [
+      {
+        "path": [
+          "video"
+        ],
+        "message": "Required"
+      }
+    ]
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `1xxx · the request itself`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The body failed validation. error.issues names each field and constraint.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The JSON body is malformed or missing a required field (e.g. `video`, `channel`, `query`).
+- A field has the wrong type: `limit` as a string, `video_ids` not an array.
+- `limit` is out of range, or a single-video option (`mode`, `ai_fallback`) was sent to a list endpoint.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Read the `error.issues` array in the response; it names the exact field and constraint that failed.
+- Compare your body against the request example in the endpoint's docs page.
+- Send `Content-Type: application/json` and valid JSON (no trailing commas).
+
+**Retryable?** Only after correcting the body; the same body will fail the same way. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unauthorized](/errors/unauthorized) (1101), the request never got far enough to be validated
+- [invalid_cursor](/errors/invalid_cursor) (1002), a well-formed body whose pagination cursor is stale
+- [idempotency_conflict](/errors/idempotency_conflict) (1201), a valid body reused an Idempotency-Key from a different body

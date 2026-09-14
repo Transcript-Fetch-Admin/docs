@@ -1,0 +1,54 @@
+---
+title: "timeout · 5002 · HTTP 503"
+description: "Upstream fetch timed out. Transient, retry."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "timeout",
+    "number": 5002,
+    "message": "Upstream fetch timed out. Transient, retry.",
+    "docs": "https://transcriptfetch.com/docs/errors/timeout"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `5xxx · transient, retry with backoff`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Timeout.** Upstream fetch timed out. Transient, retry.
+
+Shown to end users as: “The request took too long. Please try again.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Timeout. Upstream fetch timed out. Transient, retry.
+- Transient by definition: the same request may succeed a moment later.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Transient failure. Wait the seconds in the Retry-After header when present, otherwise back off about 30 seconds, then retry the same request.
+- Back off exponentially on repeats. Failed requests are never charged.
+
+**Retryable?** Yes, after the Retry-After window (about 30 seconds when the header is absent), with exponential backoff on repeats. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [upstream_unavailable](/errors/upstream_unavailable) (5101), the service itself, rather than the fetch, was unreachable
+- [rate_limited](/errors/rate_limited) (2101), your own key's limit answers 429, never 503

@@ -1,0 +1,53 @@
+---
+title: "v1: unavailable · HTTP 422"
+description: "The video is unavailable (deleted, removed, terminated, or region-blocked)."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "reason": "unavailable",
+  "error": {
+    "code": "unavailable",
+    "message": "The video is unavailable (deleted, removed, terminated, or region-blocked)."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Unavailable.** The video is unavailable (deleted, removed, terminated, or region-blocked).
+
+Shown to end users as: “This video is unavailable, it may be deleted, removed, or region-blocked.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Unavailable. The video is unavailable (deleted, removed, terminated, or region-blocked).
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: the content itself is not accessible to fetch.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/v1/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

@@ -1,0 +1,55 @@
+---
+title: "v1: connection · HTTP 503"
+description: "Could not connect to the upstream service. Transient, retry."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "reason": "connection",
+  "error": {
+    "code": "connection",
+    "message": "Could not connect to the upstream service. Transient, retry."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Connection error.** Could not connect to the upstream service. Transient, retry.
+
+Shown to end users as: “We couldn't reach the transcript service. Please try again shortly.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Connection error. Could not connect to the upstream service. Transient, retry.
+- Transient by definition: the same request may succeed a moment later.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Transient failure. Wait the seconds in the Retry-After header when present, otherwise back off about 30 seconds, then retry the same request.
+- Back off exponentially on repeats. Failed requests are never charged.
+
+**Retryable?** Yes, after the Retry-After window (about 30 seconds when the header is absent), with exponential backoff on repeats. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [upstream_unavailable](/v1/errors/upstream_unavailable) (5101), the service itself, rather than the fetch, was unreachable
+- [rate_limited](/v1/errors/rate_limited) (2101), your own key's limit answers 429, never 503

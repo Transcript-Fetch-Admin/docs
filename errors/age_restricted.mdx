@@ -1,0 +1,56 @@
+---
+title: "age_restricted · 4004 · HTTP 422"
+description: "The video is age-restricted and not accessible without sign-in."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "age_restricted",
+    "number": 4004,
+    "message": "The video is age-restricted and not accessible without sign-in.",
+    "docs": "https://transcriptfetch.com/docs/errors/age_restricted",
+    "retry_with": {
+      "mode": "audio"
+    }
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `4xxx · the media has no transcript to give`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Age-restricted.** The video is age-restricted and not accessible without sign-in.
+
+Shown to end users as: “This video is age-restricted, so its transcript can't be fetched.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Age-restricted. The video is age-restricted and not accessible without sign-in.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- The content likely contains speech even though no caption track can be served, so AI transcription of the audio may still produce a transcript. When it can, the response carries `error.retry_with: &#123; "mode": "audio" &#125;`; send that and it bills from 1 credit (1 credit per started minute of audio) on delivery, never on failure.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [audio_ineligible](/errors/audio_ineligible) (3004), an audio retry on an input transcription cannot serve
+- [insufficient_credits](/errors/insufficient_credits) (2001), an audio retry the balance cannot cover

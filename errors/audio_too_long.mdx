@@ -1,0 +1,52 @@
+---
+title: "audio_too_long · 3006 · HTTP 422"
+description: "The media is longer than this account can transcribe in one request - either past the AI-transcription length limit, or past what the remaining credit balance covers. No audio was downloaded, so nothing was charged. Distinct from no_speech, which means audio WAS transcribed and carried no speech. Retrying the same media changes nothing; the response's message says which limit applied."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "audio_too_long",
+    "number": 3006,
+    "message": "The media is longer than this account can transcribe in one request - either past the AI-transcription length limit, or past what the remaining credit balance covers. No audio was downloaded, so nothing was charged. Distinct from no_speech, which means audio WAS transcribed and carried no speech. Retrying the same media changes nothing; the response's message says which limit applied.",
+    "docs": "https://transcriptfetch.com/docs/errors/audio_too_long"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `3xxx · this input cannot be served`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Too long to transcribe.** The media is longer than this account can transcribe in one request - either past the AI-transcription length limit, or past what the remaining credit balance covers. No audio was downloaded, so nothing was charged. Distinct from no_speech, which means audio WAS transcribed and carried no speech. Retrying the same media changes nothing; the response's message says which limit applied.
+
+Shown to end users as: “This video is longer than we can transcribe. Try a shorter video, or fetch its captions instead.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Too long to transcribe. The media is longer than this account can transcribe in one request - either past the AI-transcription length limit, or past what the remaining credit balance covers. No audio was downloaded, so nothing was charged. Distinct from no_speech, which means audio WAS transcribed and carried no speech. Retrying the same media changes nothing; the response's message says which limit applied.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: the content itself is not accessible to fetch.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

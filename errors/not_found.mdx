@@ -1,0 +1,51 @@
+---
+title: "not_found · 1301 · HTTP 404"
+description: "No such resource for this account - an unknown job id, or a job that belongs to someone else."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "not_found",
+    "number": 1301,
+    "message": "No such resource for this account - an unknown job id, or a job that belongs to someone else.",
+    "docs": "https://transcriptfetch.com/docs/errors/not_found"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `1xxx · the request itself`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+No such resource for this account - an unknown job id, or a job that belongs to someone else.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The job id does not exist, or belongs to another account (both answer the same way, so ids cannot be enumerated).
+- The id was truncated or taken from a different environment.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Use the `job_id` exactly as the 202 response or the batch entry returned it.
+- Poll with the same API key that created the job.
+
+**Retryable?** No; the same id will keep answering 404. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unauthorized](/errors/unauthorized) (1101), a key that is wrong altogether fails before the lookup

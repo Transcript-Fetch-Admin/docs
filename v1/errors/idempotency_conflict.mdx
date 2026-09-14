@@ -1,0 +1,51 @@
+---
+title: "v1: idempotency_conflict · HTTP 409"
+description: "Idempotency-Key reused with a different body, or a request with that key is still in flight."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "idempotency_conflict",
+    "message": "Idempotency-Key reused with a different body, or a request with that key is still in flight."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+Idempotency-Key reused with a different body, or a request with that key is still in flight.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- An `Idempotency-Key` header was reused with a different request body.
+- A request with the same key is still in flight (a client retried before the first attempt finished).
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Generate a fresh key (UUID) per logical request; reuse a key only to retry the exact same body.
+- If the first request is still running, wait for it to settle instead of firing a duplicate.
+
+**Retryable?** Yes, with a new Idempotency-Key, or after the in-flight request completes. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [invalid_request](/v1/errors/invalid_request) (1001), the usual cause is a body that changed between retries

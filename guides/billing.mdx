@@ -1,0 +1,81 @@
+---
+title: "Billing & credits"
+description: "One unit, the credit, charged only on success. What each request costs, how audio is billed, what the plans include, and how top-ups and rollover work."
+---
+
+<a id="sec-one-unit-the-credit" />
+
+## One unit: the credit
+
+Every plan, top-up and request is measured in credits. A credit is charged only when a request succeeds, so the price of a call is the price of an answer. A caption transcript or non-empty listing page uses one credit. An AI-transcribed result can use several credits, depending on audio duration.
+
+| Request | Cost |
+| --- | --- |
+| Video transcript from an existing caption track | 1 credit, any length |
+| Audio transcription (no caption track, or `mode: "audio"`) | 1 credit per started minute of audio, minimum 1, charged on delivery |
+| Channel videos, playlist videos, or video search, per page | 1 credit |
+| Channel page with nothing newer than `since_video_id` | Free |
+| `GET /api/v2/me`, `GET /api/v2/health`, polling a job | Free |
+| Any failed, blocked, empty, or `no_transcript` result | Free |
+
+Batch calls are priced per entry, on the same table: a batch of 50 that returns 47 caption transcripts costs 47 credits. AI-transcribed entries are billed by audio duration, only on delivery.
+
+<a id="sec-audio-transcription-worked-out" />
+
+## Audio transcription, worked out
+
+Captions are one credit regardless of length. Audio is billed by duration, and only once the transcript is delivered, so a job that fails half-way costs nothing.
+
+| Audio length | Credits |
+| --- | --- |
+| Under 30 seconds | 1 |
+| 10 minutes | 10 |
+| 20 minutes | 20 |
+| 1 hour | 60 |
+| 4 hours (the cap) | 240 |
+
+If you want to guarantee a request never spends more than one credit, send `mode: "captions"`. It fails with `no_captions` instead of transcribing. Every response that escalates to audio carries an `ai_fallback.cost_credits` figure so you can see the charge before it lands, and every response reports `usage.credits_spent` and `usage.balance`.
+
+<a id="sec-plans" />
+
+## Plans
+
+| Plan | Monthly | Credits a month | Per 1,000 | Rate limit | Batch cap | Rollover |
+| --- | --- | --- | --- | --- | --- | --- |
+| Free | $0, no card | 50 |  | 10 / min | 50 | No |
+| Basic | $5 | 1,000 | $5.00 | 60 / min | 50 | Up to 2x |
+| Pro | $15 | 10,000 | $1.50 | 300 / min | 50 | Up to 2x |
+| Mega | $45 | 50,000 | $0.90 | 900 / min | 500 | Up to 2x |
+| Scale | $229 | 300,000 | $0.76 | 900 / min | 500 | Up to 2x |
+
+Credits refill on each renewal. Annual billing charges ten months for twelve and grants the same monthly credits. On every paid plan, unused plan credits carry into the next month and the new grant is added on top, until the plan balance reaches twice the monthly allowance. On Pro, spend 4,000 of 10,000 and you renew with 16,000; leave that untouched and the next renewal stops at the 20,000 cap. A plan change never removes credits: a balance above the new plan's cap is kept and simply gains nothing until it falls below the cap. The free tier does not roll over; it resets to 50 each month.
+
+<a id="sec-top-ups" />
+
+## Top-ups
+
+A top-up adds credits to your balance without changing your plan, at the plan's own per-1,000 rate. Top-up credits never expire and are spent after plan credits.
+
+Because the card fee is mostly fixed, the smallest bundle grows with the plan so that one purchase is always at least $5:
+
+| Plan | Per 1,000 | Smallest bundle |
+| --- | --- | --- |
+| No plan | $10.00 | 1,000 credits for $10 |
+| Basic | $5.00 | 1,000 credits for $5 |
+| Pro | $1.50 | 5,000 credits for $7.50 |
+| Mega | $0.90 | 10,000 credits for $9 |
+| Scale | $0.76 | 10,000 credits for $7.60 |
+
+Buy any number of bundles from the dashboard's Plans page. A lapsed subscription (a failed renewal) cannot top up until the payment method is fixed.
+
+<a id="sec-running-out" />
+
+## Running out
+
+There is no overage billing. When the balance reaches zero, requests return `402 insufficient_credits` and nothing is charged. Fix it by topping up or upgrading; the free 50 credits return each month for accounts without a plan.
+
+<a id="sec-checking-your-balance" />
+
+## Checking your balance
+
+`GET /api/v2/me` returns the current balance and is free. The MCP server exposes the same figure as the `get_credits` tool. The dashboard shows spend per day and per key.

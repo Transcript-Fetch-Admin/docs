@@ -1,0 +1,52 @@
+---
+title: "drm_protected · 3007 · HTTP 422"
+description: "The source is DRM-protected and cannot be downloaded. Spotify and Apple Podcasts pages fall here; podcast links are not supported."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "drm_protected",
+    "number": 3007,
+    "message": "The source is DRM-protected and cannot be downloaded. Spotify and Apple Podcasts pages fall here; podcast links are not supported.",
+    "docs": "https://transcriptfetch.com/docs/errors/drm_protected"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `3xxx · this input cannot be served`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**DRM-protected.** The source is DRM-protected and cannot be downloaded. Spotify and Apple Podcasts pages fall here; podcast links are not supported.
+
+Shown to end users as: “This content is DRM-protected, so it can't be transcribed.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- DRM-protected. The source is DRM-protected and cannot be downloaded. Spotify and Apple Podcasts pages fall here; podcast links are not supported.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: the content itself is not accessible to fetch.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

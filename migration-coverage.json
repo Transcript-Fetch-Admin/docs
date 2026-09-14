@@ -1,0 +1,676 @@
+{
+  "sourceCommit": "9c285dae",
+  "snapshotDate": "2026-09-14",
+  "scope": "All public /docs routes; published custom docs query returned zero rows.",
+  "boundaries": [
+    "Original documentation unchanged",
+    "Live request builder stays on canonical site",
+    "No restored authentication or API-key standalone pages",
+    "Legacy v1 material separated from v2",
+    "MCP blanket one-credit sentence corrected to match duration billing"
+  ],
+  "routes": [
+    {
+      "source": "/docs",
+      "version": 2,
+      "target": "quickstart",
+      "headings": 6,
+      "codeSamples": 2
+    },
+    {
+      "source": "/docs/output",
+      "version": 2,
+      "target": "reference/output",
+      "headings": 5,
+      "codeSamples": 3
+    },
+    {
+      "source": "/docs/sources",
+      "version": 2,
+      "target": "guides/sources",
+      "headings": 3,
+      "codeSamples": 0
+    },
+    {
+      "source": "/docs/mcp",
+      "version": 2,
+      "target": "sdks/mcp",
+      "headings": 3,
+      "codeSamples": 3
+    },
+    {
+      "source": "/docs/errors",
+      "version": 2,
+      "target": "errors/overview",
+      "headings": 4,
+      "codeSamples": 0
+    },
+    {
+      "source": "/docs/rate-limits",
+      "version": 2,
+      "target": "guides/rate-limits",
+      "headings": 0,
+      "codeSamples": 2
+    },
+    {
+      "source": "/docs/billing",
+      "version": 2,
+      "target": "guides/billing",
+      "headings": 6,
+      "codeSamples": 0
+    },
+    {
+      "source": "/docs/transcription",
+      "version": 2,
+      "target": "guides/transcription",
+      "headings": 8,
+      "codeSamples": 7
+    },
+    {
+      "source": "/docs/pagination",
+      "version": 2,
+      "target": "guides/pagination",
+      "headings": 2,
+      "codeSamples": 3
+    },
+    {
+      "source": "/docs/python",
+      "version": 2,
+      "target": "sdks/python",
+      "headings": 7,
+      "codeSamples": 7
+    },
+    {
+      "source": "/docs/node",
+      "version": 2,
+      "target": "sdks/node",
+      "headings": 6,
+      "codeSamples": 6
+    },
+    {
+      "source": "/docs/errors/invalid_request",
+      "version": 2,
+      "target": "errors/invalid_request",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/invalid_cursor",
+      "version": 2,
+      "target": "errors/invalid_cursor",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unauthorized",
+      "version": 2,
+      "target": "errors/unauthorized",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/idempotency_conflict",
+      "version": 2,
+      "target": "errors/idempotency_conflict",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/not_found",
+      "version": 2,
+      "target": "errors/not_found",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/insufficient_credits",
+      "version": 2,
+      "target": "errors/insufficient_credits",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/batch_too_large",
+      "version": 2,
+      "target": "errors/batch_too_large",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/rate_limited",
+      "version": 2,
+      "target": "errors/rate_limited",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unsupported_platform",
+      "version": 2,
+      "target": "errors/unsupported_platform",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/endpoint_platform_mismatch",
+      "version": 2,
+      "target": "errors/endpoint_platform_mismatch",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/audio_ineligible",
+      "version": 2,
+      "target": "errors/audio_ineligible",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/invalid_input",
+      "version": 2,
+      "target": "errors/invalid_input",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/audio_too_long",
+      "version": 2,
+      "target": "errors/audio_too_long",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/drm_protected",
+      "version": 2,
+      "target": "errors/drm_protected",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/private",
+      "version": 2,
+      "target": "errors/private",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unavailable",
+      "version": 2,
+      "target": "errors/unavailable",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/members_only",
+      "version": 2,
+      "target": "errors/members_only",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/age_restricted",
+      "version": 2,
+      "target": "errors/age_restricted",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/region_blocked",
+      "version": 2,
+      "target": "errors/region_blocked",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/live_stream",
+      "version": 2,
+      "target": "errors/live_stream",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/was_live",
+      "version": 2,
+      "target": "errors/was_live",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/no_captions",
+      "version": 2,
+      "target": "errors/no_captions",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/captions_disabled",
+      "version": 2,
+      "target": "errors/captions_disabled",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/no_speech",
+      "version": 2,
+      "target": "errors/no_speech",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/no_audio_stream",
+      "version": 2,
+      "target": "errors/no_audio_stream",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/upstream_error",
+      "version": 2,
+      "target": "errors/upstream_error",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/timeout",
+      "version": 2,
+      "target": "errors/timeout",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/connection",
+      "version": 2,
+      "target": "errors/connection",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/proxy_unavailable",
+      "version": 2,
+      "target": "errors/proxy_unavailable",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/parse_error",
+      "version": 2,
+      "target": "errors/parse_error",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/upstream_unavailable",
+      "version": 2,
+      "target": "errors/upstream_unavailable",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/internal_error",
+      "version": 2,
+      "target": "errors/internal_error",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unknown",
+      "version": 2,
+      "target": "errors/unknown",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs",
+      "version": 1,
+      "target": "v1/quickstart",
+      "headings": 6,
+      "codeSamples": 2
+    },
+    {
+      "source": "/docs/output",
+      "version": 1,
+      "target": "v1/reference/output",
+      "headings": 5,
+      "codeSamples": 3
+    },
+    {
+      "source": "/docs/errors",
+      "version": 1,
+      "target": "v1/errors/overview",
+      "headings": 4,
+      "codeSamples": 0
+    },
+    {
+      "source": "/docs/errors/invalid_request",
+      "version": 1,
+      "target": "v1/errors/invalid_request",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/invalid_cursor",
+      "version": 1,
+      "target": "v1/errors/invalid_cursor",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unauthorized",
+      "version": 1,
+      "target": "v1/errors/unauthorized",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/idempotency_conflict",
+      "version": 1,
+      "target": "v1/errors/idempotency_conflict",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/not_found",
+      "version": 1,
+      "target": "v1/errors/not_found",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/insufficient_credits",
+      "version": 1,
+      "target": "v1/errors/insufficient_credits",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/batch_too_large",
+      "version": 1,
+      "target": "v1/errors/batch_too_large",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/rate_limited",
+      "version": 1,
+      "target": "v1/errors/rate_limited",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unsupported_platform",
+      "version": 1,
+      "target": "v1/errors/unsupported_platform",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/endpoint_platform_mismatch",
+      "version": 1,
+      "target": "v1/errors/endpoint_platform_mismatch",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/audio_ineligible",
+      "version": 1,
+      "target": "v1/errors/audio_ineligible",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/invalid_input",
+      "version": 1,
+      "target": "v1/errors/invalid_input",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/audio_too_long",
+      "version": 1,
+      "target": "v1/errors/audio_too_long",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/drm_protected",
+      "version": 1,
+      "target": "v1/errors/drm_protected",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/private",
+      "version": 1,
+      "target": "v1/errors/private",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unavailable",
+      "version": 1,
+      "target": "v1/errors/unavailable",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/members_only",
+      "version": 1,
+      "target": "v1/errors/members_only",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/age_restricted",
+      "version": 1,
+      "target": "v1/errors/age_restricted",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/region_blocked",
+      "version": 1,
+      "target": "v1/errors/region_blocked",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/live_stream",
+      "version": 1,
+      "target": "v1/errors/live_stream",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/was_live",
+      "version": 1,
+      "target": "v1/errors/was_live",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/no_captions",
+      "version": 1,
+      "target": "v1/errors/no_captions",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/captions_disabled",
+      "version": 1,
+      "target": "v1/errors/captions_disabled",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/no_speech",
+      "version": 1,
+      "target": "v1/errors/no_speech",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/no_audio_stream",
+      "version": 1,
+      "target": "v1/errors/no_audio_stream",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/upstream_error",
+      "version": 1,
+      "target": "v1/errors/upstream_error",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/timeout",
+      "version": 1,
+      "target": "v1/errors/timeout",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/connection",
+      "version": 1,
+      "target": "v1/errors/connection",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/proxy_unavailable",
+      "version": 1,
+      "target": "v1/errors/proxy_unavailable",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/parse_error",
+      "version": 1,
+      "target": "v1/errors/parse_error",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/upstream_unavailable",
+      "version": 1,
+      "target": "v1/errors/upstream_unavailable",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/internal_error",
+      "version": 1,
+      "target": "v1/errors/internal_error",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/errors/unknown",
+      "version": 1,
+      "target": "v1/errors/unknown",
+      "headings": 5,
+      "codeSamples": 1
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchVideoTranscript",
+      "version": 2,
+      "target": "api-reference/video",
+      "operation": "POST /api/v2/transcripts/video"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchChannelVideos",
+      "version": 2,
+      "target": "api-reference/channel",
+      "operation": "POST /api/v2/transcripts/channel"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchPlaylistVideos",
+      "version": 2,
+      "target": "api-reference/playlist",
+      "operation": "POST /api/v2/transcripts/playlist"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-searchVideos",
+      "version": 2,
+      "target": "api-reference/search",
+      "operation": "POST /api/v2/transcripts/search"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-getTranscriptJob",
+      "version": 2,
+      "target": "api-reference/job-status",
+      "operation": "GET /api/v2/transcripts/jobs/{jobId}"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchTranscriptsBatch",
+      "version": 2,
+      "target": "api-reference/batch",
+      "operation": "POST /api/v2/transcripts/batch"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-me",
+      "version": 2,
+      "target": "api-reference/me",
+      "operation": "GET /api/v2/me"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-healthCheck",
+      "version": 2,
+      "target": "api-reference/health",
+      "operation": "GET /api/v2/health"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchVideoTranscript",
+      "version": 1,
+      "target": "v1/api-reference/video",
+      "operation": "POST /api/v1/transcripts/video"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchChannelVideos",
+      "version": 1,
+      "target": "v1/api-reference/channel",
+      "operation": "POST /api/v1/transcripts/channel"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchPlaylistVideos",
+      "version": 1,
+      "target": "v1/api-reference/playlist",
+      "operation": "POST /api/v1/transcripts/playlist"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-searchVideos",
+      "version": 1,
+      "target": "v1/api-reference/search",
+      "operation": "POST /api/v1/transcripts/search"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-getTranscriptJob",
+      "version": 1,
+      "target": "v1/api-reference/job-status",
+      "operation": "GET /api/v1/transcripts/jobs/{jobId}"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-fetchTranscriptsBatch",
+      "version": 1,
+      "target": "v1/api-reference/batch",
+      "operation": "POST /api/v1/transcripts/batch"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-me",
+      "version": 1,
+      "target": "v1/api-reference/me",
+      "operation": "GET /api/v1/me"
+    },
+    {
+      "source": "/docs/endpoints#endpoint-healthCheck",
+      "version": 1,
+      "target": "v1/api-reference/health",
+      "operation": "GET /api/v1/health"
+    },
+    {
+      "source": "/docs/request-builder",
+      "version": 2,
+      "target": "request-builder",
+      "status": "Documented and linked; interactive application retained on canonical site"
+    }
+  ]
+}

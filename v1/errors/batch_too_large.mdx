@@ -1,0 +1,51 @@
+---
+title: "v1: batch_too_large · HTTP 400"
+description: "The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "invalid_request",
+    "message": "The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint. **v1 never emits this code**; it answers `invalid_request` for this situation.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- More video ids than your plan allows in one batch call. `error.details` carries `max` (your cap) and `sent`.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Split the list into batches of at most `details.max`.
+- Upgrade for a larger cap: 50 on the free tier, Basic and Pro; 500 on Mega and Scale.
+
+**Retryable?** Only with a smaller batch. Nothing was fetched or charged. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [invalid_request](/v1/errors/invalid_request) (1001), an empty list, or a list with non-string entries, fails validation instead
+- [insufficient_credits](/v1/errors/insufficient_credits) (2001), a batch within the cap can still exceed the balance

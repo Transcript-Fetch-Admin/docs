@@ -1,0 +1,97 @@
+---
+title: "v1: Get your first transcript"
+description: "Create an API key, send one request, and understand the response."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+Retrieve existing captions or transcribe accessible audio, then use the timestamped text in your application.
+
+<a id="sec-api-key" />
+
+## Create your API key
+
+Create an account with no card required. Your account includes 50 free credits each month. Open [Manage API keys](https://transcriptfetch.com/app/keys), create a key, and store it in a server-side environment variable. Never expose it in browser code or commit it to source control.
+
+`export TRANSCRIPTFETCH_API_KEY=tf_live_YOUR_KEY`
+
+<a id="sec-authentication" />
+
+## Authenticate your requests
+
+Authenticated endpoints expect your API key as a bearer token. The official SDKs read it from the environment variable above; when using cURL, send it in the Authorization header.
+
+Base URL: `https://transcriptfetch.com/api/v1`
+
+`Authorization: Bearer $TRANSCRIPTFETCH_API_KEY`
+
+<a id="sec-first-request" />
+
+## Send your first request
+
+With your key stored server-side, send a supported URL or video ID to `/transcripts/video`. A completed response includes timestamped segments and a usage record.
+
+Using an SDK? Install the package first: [Node.js setup](/sdks/node#sec-install) · [Python setup](/sdks/python#sec-install)
+
+```bash
+curl https://transcriptfetch.com/api/v1/transcripts/video \
+  -H "Authorization: Bearer $TRANSCRIPTFETCH_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"video":"dQw4w9WgXcQ"}'
+```
+
+<a id="sec-request-outcomes" />
+
+### What happens next?
+
+Requests use mode: "auto" by default: try existing captions, then transcribe audio when captions are unavailable. Use mode: "captions" for captions only, or mode: "audio" to request transcription directly.
+
+- 200: the transcript is ready. Read data.segments and usage as shown below.
+- 202: transcription is still processing. Save the returned job_id and follow poll_url with the same bearer token. A successful poll can still be processing, so check status until it is completed or failed.
+
+Caption retrieval uses one credit per delivered transcript. Audio transcription is billed by duration on delivery, not when a job is accepted.
+
+[Polling and callbacks](/guides/transcription#sec-polling-the-job) · [Modes and transcription pricing](/guides/transcription#sec-choosing-a-mode)
+
+<a id="sec-response" />
+
+## Understand the response
+
+Read the timestamped transcript from `data.segments`. The `usage` object reports the charge and your remaining balance. Keep `request_id` when troubleshooting or contacting support.
+
+```json
+{
+  "ok": true,
+  "request_id": "req_…",
+  "data": {
+    "kind": "transcript",
+    "video_id": "dQw4w9WgXcQ",
+    "platform": "youtube",
+    "title": "Example video",
+    "segments": [
+      { "start": 0, "duration": 3.5, "text": "We're no strangers to love" }
+    ]
+  },
+  "usage": { "credits_spent": 1, "balance": 49, "bytes": 14233 }
+}
+```
+
+<a id="sec-next" />
+
+## Choose your next step
+
+[Supported sources](/guides/sources)
+
+Accepted URL formats and platform-specific capabilities.
+
+[AI transcription](/guides/transcription)
+
+Caption fallback, audio pricing, polling, and callbacks.
+
+[Request builder](/request-builder)
+
+Build a real request and generate cURL, Node, or Python.
+
+[Handle errors](/v1/errors/overview)
+
+Know what failed, whether to retry, and what is billed.

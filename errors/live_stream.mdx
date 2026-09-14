@@ -1,0 +1,58 @@
+---
+title: "live_stream · 4101 · HTTP 422"
+description: "The video is a live stream: broadcasting now, scheduled, or ended without a published recording. Live streams are not supported; retrying will not help until YouTube publishes a recording (24/7 streams never get one)."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "live_stream",
+    "number": 4101,
+    "message": "The video is a live stream: broadcasting now, scheduled, or ended without a published recording. Live streams are not supported; retrying will not help until YouTube publishes a recording (24/7 streams never get one).",
+    "docs": "https://transcriptfetch.com/docs/errors/live_stream"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `4xxx · the media has no transcript to give`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Live stream.** The video is a live stream: broadcasting now, scheduled, or ended without a published recording. Live streams are not supported; retrying will not help until YouTube publishes a recording (24/7 streams never get one).
+
+Shown to end users as: “Live streams aren't supported. Once the broadcast has ended and YouTube has published the recording, the video can be fetched like any other.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Live streams are not supported. The video is broadcasting right now, so there is no finished caption track or audio file to fetch. 24/7 streams (lofi radio, news channels, webcams) are always in this state.
+- A finished live stream whose recording YouTube never published. yt-dlp reports it as "This live event has ended" or, for a 24/7 stream, "This live stream recording is not available"; nothing will ever be fetchable at that URL.
+- A scheduled premiere or live event that has not started yet ("This live event will begin in ...").
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Do not retry while the stream is live: the same request fails the same way and nothing on your side changes it. Failed requests are never charged.
+- Once the broadcast has ended and YouTube has published the recording (usually within minutes, sometimes hours for long streams), send the same request again: it is then an ordinary video and either its captions are served or the audio is transcribed.
+- To detect this before calling, YouTube's page or Data API marks the video as live (liveBroadcastContent is "live" or "upcoming"); skip those in a pipeline and revisit them later.
+- AI transcription would not help: there is no complete audio file to transcribe while the stream is running.
+
+**Retryable?** Not while it is live. After the broadcast ends and the recording is published, the same request succeeds; that is a new state of the video, not a retry. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [was_live](/errors/was_live) (4102), the broadcast has ended and the recording exists, but it carries no caption track
+- [unavailable](/errors/unavailable) (4002), the video is gone entirely rather than still broadcasting
+- [no_captions](/errors/no_captions) (4103), an ordinary video with no caption track, which audio transcription can serve

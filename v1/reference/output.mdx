@@ -1,0 +1,153 @@
+---
+title: "v1: Response format"
+description: "Every successful response shares the same envelope: ok, a request_id (also returned as the X-Request-Id header), a data object whose kind tells you what it holds, and a usage block."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-response-envelope" />
+
+## Response envelope
+
+Every successful response shares the same envelope: `ok`, a `request_id` (also sent as the `X-Request-Id` header), a `data` object whose `kind` names what it holds, and a `usage` block.
+
+There are four `data.kind` shapes: `transcript` (single video), `video_list` (channel / playlist / search), `transcript_batch` (batch), and `transcript_job` (the 202 envelope and job polling, see the [transcription guide](/guides/transcription)).
+
+<a id="sec-single-transcript" />
+
+### Single transcript
+
+The `/video` endpoint returns `kind: "transcript"` with **either** a joined `text` string **or** a timestamped `segments` array, never both. The `timestamps` request field chooses: `true` (the default) returns `segments`, `false` returns `text`. The unwanted key is absent, not `null`, so check for presence, not truthiness. Each segment's `start` and `duration` are in seconds, everything needed to render timestamps or export SRT/VTT. `source` says where the words came from: `"captions"` for an existing caption track, `"audio"` for AI transcription (billed by length, see `usage.credits_spent`). Podcast episodes transcribed with speaker diarization additionally carry a `speaker` id per segment and a top-level `diarized: true`.
+
+```json
+{
+  "ok": true,
+  "request_id": "req_…",
+  "data": {
+    "kind": "transcript",
+    "video_id": "dQw4w9WgXcQ",
+    "platform": "youtube",
+    "title": "Example video",
+    "thumbnailUrl": "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+    "segments": [
+      {
+        "start": 0,
+        "duration": 3.5,
+        "text": "We're no strangers to love"
+      }
+    ]
+  },
+  "usage": {
+    "credits_spent": 1,
+    "balance": 99,
+    "bytes": 14233
+  }
+}
+```
+
+<a id="sec-video-list-channel-playlist-search" />
+
+### Video list (channel / playlist / search)
+
+The `/channel`, `/playlist`, and `/search` endpoints return `kind: "video_list"`, a `videos` array of metadata plus a `next_cursor` for pagination. Fetch the transcripts separately via the batch endpoint.
+
+```json
+{
+  "ok": true,
+  "request_id": "req_…",
+  "data": {
+    "kind": "video_list",
+    "source": "search",
+    "videos": [
+      {
+        "videoId": "dQw4w9WgXcQ",
+        "title": "Example video",
+        "thumbnailUrl": "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
+        "duration": 212,
+        "channel": "Example Channel"
+      }
+    ],
+    "next_cursor": "eyJvIjoxMH0"
+  },
+  "usage": {
+    "credits_spent": 1,
+    "balance": 98,
+    "bytes": 0
+  }
+}
+```
+
+<a id="sec-batch" />
+
+### Batch
+
+The batch endpoint returns `kind: "transcript_batch"` with one entry per requested video in `data.results`. Batch entries carry **both** `text` and `segments` (the `timestamps` flag is not accepted on batch), plus `outcome`: `ok`, `processing`, or `error`. A failed entry carries the same `error` block as a request-level failure; entries without text do not ship the text fields at all.
+
+Entries with no caption track are **transcribed from audio by default**: those come back with `outcome: "processing"` plus a `job_id` and `poll_url`, cost nothing on the batch call, and are billed on delivery at the audio rate. Re-send the same batch once they finish and the text is returned normally — polling is optional. Send `mode: "captions"` to have captionless entries fail as `error` with code `no_captions` (and a `retry_with` naming the audio mode) instead.
+
+```json
+{
+  "ok": true,
+  "request_id": "req_…",
+  "data": {
+    "kind": "transcript_batch",
+    "results": [
+      {
+        "video_id": "dQw4w9WgXcQ",
+        "outcome": "ok",
+        "reason": null,
+        "message": null,
+        "title": "Example video",
+        "text": "Full transcript text …",
+        "segments": [
+          {
+            "start": 0,
+            "duration": 3.5,
+            "text": "Full transcript …"
+          }
+        ],
+        "bytes": 14233
+      },
+      {
+        "video_id": "9bZkp7q19f0",
+        "outcome": "processing",
+        "reason": null,
+        "message": "No caption track; transcribing the audio. Re-request this video to collect the text, or poll poll_url.",
+        "job_id": "asr_…",
+        "poll_url": "/api/v1/transcripts/jobs/asr_…",
+        "title": null,
+        "text": null,
+        "segments": null,
+        "bytes": 0
+      },
+      {
+        "video_id": "jNQXAC9IVRw",
+        "outcome": "no_transcript",
+        "reason": "no_captions",
+        "message": "No caption track (manual or auto-generated) is available. (Seen with mode: \"captions\"; the default transcribes instead.)",
+        "title": null,
+        "text": null,
+        "segments": null,
+        "bytes": 0
+      }
+    ]
+  },
+  "usage": {
+    "credits_spent": 1,
+    "balance": 97
+  }
+}
+```
+
+<a id="sec-field-reference" />
+
+## Field reference
+
+- `data.kind`: `transcript`, `video_list`, `transcript_batch`, or `transcript_job`.
+- `text` / `segments`: exactly one on single-transcript responses (chosen by `timestamps`); both on batch entries and completed job results. Segments are `{ start, duration, text }` cues in seconds (`speaker` added when diarized).
+- `next_cursor`: pass back as `cursor` for the next page of a list, `null` when exhausted.
+- `outcome` (batch results): `ok`, `processing`, or `error`; failed entries carry `error` (the standard block), and `processing` entries (captionless videos being transcribed from audio) carry `job_id` and `poll_url`.
+- `source` (transcripts): `"captions"` or `"audio"`.
+- `usage.credits_spent`: credits charged for this request. Failures are never charged and carry no `usage` block.
+- `usage.balance`: remaining credit balance (`null` for unlimited accounts).
+- `usage.bytes`: upstream bytes this request consumed (absent on batch, which reports per-entry `bytes`).

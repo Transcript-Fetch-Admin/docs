@@ -1,0 +1,33 @@
+---
+title: "Supported sources"
+description: "One endpoint per source type. Paste a URL, handle, ID, or query, each route normalizes what you give it."
+---
+
+| Route | Field | Accepts | Example value |
+| --- | --- | --- | --- |
+| `/video` | `video` | YouTube URL (watch, youtu.be, /shorts/) or 11-char ID; TikTok video URL or bare numeric ID; Instagram video URL; a direct media file URL (mp4/mp3/wav); or any other http(s) video page, attempted best-effort. X/Twitter and Facebook links are not supported and return 422 unsupported_platform. | https://www.tiktok.com/@user/video/7137723462233555205 |
+| `/playlist` | `playlist` | Playlist URL or playlist ID (PL…, UU…, OL…, etc.) | https://www.youtube.com/playlist?list=PL... |
+| `/channel` | `channel` | @handle, /channel/UC… URL, /c/ or /user/ URL, or UC… ID | https://www.youtube.com/@veritasium |
+| `/search` | `query` | Any keyword query | how transformers work |
+
+**You don't need to extract IDs yourself.** Full URLs are parsed server-side, and a watch URL with a `list=` param works for either `/video` (just that video) or `/playlist` (the whole list), depending on the endpoint you call.
+
+<a id="sec-every-host-video-recognizes" />
+
+## Every host /video recognizes
+
+The named transcript sources are YouTube, TikTok, Instagram, X, Facebook, and Direct media file.
+
+There is also a generic tier: **any other http(s) URL** is attempted best-effort with the generic extractor, which handles many video sites that are not listed by name.
+
+<a id="sec-where-ai-transcription-applies" />
+
+## Where AI transcription applies
+
+When a source has no captions, the [AI transcription fallback](/guides/transcription) covers **YouTube, TikTok, Instagram, and direct media file URLs**. Generic sites are best-effort caption and extractor targets only: a fetch may well succeed, but AI transcription is not guaranteed for them.
+
+<a id="sec-bare-ids" />
+
+## Bare IDs
+
+You can send a bare 11-character YouTube video id, or a bare 17 to 20 digit TikTok video id, instead of a URL. `/channel` and `/search` support YouTube, TikTok, and Instagram; `/playlist` supports YouTube, and TikTok; `/video` accepts every named transcript source.

@@ -1,0 +1,52 @@
+---
+title: "rate_limited · 2101 · HTTP 429"
+description: "Your key's per-plan request rate was exceeded. Wait Retry-After seconds, then continue."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "rate_limited",
+    "number": 2101,
+    "message": "Your key's per-plan request rate was exceeded. Wait Retry-After seconds, then continue.",
+    "docs": "https://transcriptfetch.com/docs/errors/rate_limited"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `2xxx · your account or plan`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+Your key's per-plan request rate was exceeded. Wait Retry-After seconds, then continue.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Too many requests per minute on one API key.
+- A burst of concurrent calls (a parallel loop without throttling).
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Wait the number of seconds in the `Retry-After` response header, then retry.
+- Add exponential backoff, or spread bulk work through the batch endpoint (many videos in one request = one rate-limit unit).
+
+**Retryable?** Yes, after the Retry-After window. Back off exponentially on repeats. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [upstream_error](/errors/upstream_error) (5001), a platform failing or blocking a fetch answers 503, never 429
+- [insufficient_credits](/errors/insufficient_credits) (2001), sustained 429s under load sometimes precede running dry

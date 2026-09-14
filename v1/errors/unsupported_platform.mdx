@@ -1,0 +1,53 @@
+---
+title: "v1: unsupported_platform · HTTP 422"
+description: "The input is not on a platform we serve. Transcripts cover YouTube, TikTok, Instagram and direct media files."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "unsupported_platform",
+    "message": "The input is not on a platform we serve. Transcripts cover YouTube, TikTok, Instagram and direct media files."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The input is not on a platform we serve. Transcripts cover YouTube, TikTok, Instagram and direct media files.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The URL is not on a supported platform. Transcripts are available for YouTube, TikTok, Instagram, and direct media file URLs (mp4/mp3/wav/…).
+- The URL points at an ordinary web page that happens to embed a player, rather than at the video itself.
+- X/Twitter and Facebook links, which were retired, and Spotify or Apple Podcasts links: podcasts left the product on 2026-09-10.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Send the video's own URL rather than the page it is embedded on.
+- For a direct file, make sure the URL ends in a media extension and is reachable without authentication.
+
+**Retryable?** No, not for this input. Failed requests are never charged. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [endpoint_platform_mismatch](/v1/errors/endpoint_platform_mismatch) (3002), a supported platform sent to an endpoint that does not serve it
+- [invalid_input](/v1/errors/invalid_input) (3005), a supported platform whose id or URL does not parse

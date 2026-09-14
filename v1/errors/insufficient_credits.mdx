@@ -1,0 +1,53 @@
+---
+title: "v1: insufficient_credits · HTTP 402"
+description: "Not enough credits for the request. Nothing was charged; retry once credits are available."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "insufficient_credits",
+    "message": "Not enough credits for the request. Nothing was charged; retry once credits are available."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+Not enough credits for the request. Nothing was charged; retry once credits are available.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- The account's credit balance is 0: the 50 free credits a month are spent, or a paid plan's monthly allowance is used up.
+- A batch request needs more credits than the balance holds.
+- An audio transcription would cost more than the remaining balance (it bills by length).
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Check your balance with GET /api/v2/me (free) or in the dashboard.
+- Subscribe to a plan or top up credits at transcriptfetch.com/app/plans; top-ups are priced at your plan's per-credit rate ($10 per 1,000 without a plan).
+
+**Retryable?** Yes, once credits are available. Failed requests are never charged. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unauthorized](/v1/errors/unauthorized) (1101), if the key itself is wrong, fix that before topping up
+- [batch_too_large](/v1/errors/batch_too_large) (2002), a batch can also be refused for its size, before credits are checked

@@ -1,0 +1,53 @@
+---
+title: "v1: no_audio_stream · HTTP 422"
+description: "The downloaded media carried no audio stream, so it could not be transcribed. Distinct from no_speech, which means audio exists but carries no speech. PERMANENT on purpose: retrying re-runs the same conversion on the same bytes and fails identically."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "reason": "no_audio_stream",
+  "error": {
+    "code": "no_audio_stream",
+    "message": "The downloaded media carried no audio stream, so it could not be transcribed. Distinct from no_speech, which means audio exists but carries no speech. PERMANENT on purpose: retrying re-runs the same conversion on the same bytes and fails identically."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**No audio track.** The downloaded media carried no audio stream, so it could not be transcribed. Distinct from no_speech, which means audio exists but carries no speech. PERMANENT on purpose: retrying re-runs the same conversion on the same bytes and fails identically.
+
+Shown to end users as: “That video has no audio, so there is nothing to transcribe.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- No audio track. The downloaded media carried no audio stream, so it could not be transcribed. Distinct from no_speech, which means audio exists but carries no speech. PERMANENT on purpose: retrying re-runs the same conversion on the same bytes and fails identically.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: there is no accessible speech to transcribe.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/v1/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

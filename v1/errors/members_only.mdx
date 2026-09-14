@@ -1,0 +1,54 @@
+---
+title: "v1: members_only · HTTP 422"
+description: "The video is members-only / requires a channel membership."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "reason": "members_only",
+  "error": {
+    "code": "members_only",
+    "message": "The video is members-only / requires a channel membership."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Members only.** The video is members-only / requires a channel membership.
+
+Shown to end users as: “This video is members-only and can't be transcribed.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Members only. The video is members-only / requires a channel membership.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- The content likely contains speech even though no caption track can be served, so AI transcription of the audio may still produce a transcript. When it can, the response carries `error.retry_with: &#123; "mode": "audio" &#125;`; send that and it bills from 1 credit (1 credit per started minute of audio) on delivery, never on failure.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [audio_ineligible](/v1/errors/audio_ineligible) (3004), an audio retry on an input transcription cannot serve
+- [insufficient_credits](/v1/errors/insufficient_credits) (2001), an audio retry the balance cannot cover

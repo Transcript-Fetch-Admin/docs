@@ -1,0 +1,55 @@
+---
+title: "batch_too_large · 2002 · HTTP 400"
+description: "The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "batch_too_large",
+    "number": 2002,
+    "message": "The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent.",
+    "docs": "https://transcriptfetch.com/docs/errors/batch_too_large",
+    "details": {
+      "max": 50,
+      "sent": 120
+    }
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `2xxx · your account or plan`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The batch exceeds your plan's per-request cap. error.details carries the cap and what was sent.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- More video ids than your plan allows in one batch call. `error.details` carries `max` (your cap) and `sent`.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Split the list into batches of at most `details.max`.
+- Upgrade for a larger cap: 50 on the free tier, Basic and Pro; 500 on Mega and Scale.
+
+**Retryable?** Only with a smaller batch. Nothing was fetched or charged. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [invalid_request](/errors/invalid_request) (1001), an empty list, or a list with non-string entries, fails validation instead
+- [insufficient_credits](/errors/insufficient_credits) (2001), a batch within the cap can still exceed the balance

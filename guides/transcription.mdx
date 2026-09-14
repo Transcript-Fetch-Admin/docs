@@ -1,6 +1,9 @@
 ---
-title: "Transcription and jobs"
+title: "AI transcription"
+description: "Most YouTube videos have a caption track to read. Short-form video usually does not. When there are no captions, the audio is transcribed instead: inline when the media is short, as a pollable job when it is not."
 ---
+
+<a id="sec-choosing-a-mode" />
 
 ## Choosing a mode
 
@@ -12,7 +15,9 @@ The `mode` field on `POST /api/v2/transcripts/video` decides where the text may 
 | `"captions"` | Read an existing caption track only, and fail if there is none. The only way to guarantee a synchronous answer. |
 | `"audio"` | Skip the caption lookup entirely and transcribe the audio. |
 
-```http
+HTTP
+
+```text
 POST /api/v2/transcripts/video
 
 { "video": "https://www.tiktok.com/@user/video/7137723462233555205", "mode": "audio" }
@@ -20,7 +25,9 @@ POST /api/v2/transcripts/video
 
 `ai_fallback: true` is the accepted legacy alias for `"mode": "audio"`; omitted or `false` means `"mode": "auto"`. Send one field or the other: a request carrying both `mode` and `ai_fallback` is rejected with `400 invalid_request`.
 
-> **Single-video only.** `mode: "audio"` and `ai_fallback` only mean something for one video. Sending `ai_fallback` to `/channel`, `/playlist` or `/search` returns `invalid_request`.
+**Single-video only.** `mode: "audio"` and `ai_fallback` only mean something for one video. Sending `ai_fallback` to `/channel`, `/playlist` or `/search` returns `invalid_request`.
+
+<a id="sec-what-happens-when-there-are-no-captions" />
 
 ## What happens when there are no captions
 
@@ -30,6 +37,8 @@ The default path does not fail on a missing caption track; it escalates to AI tr
 - **Everything else gets a job.** The response is `202 Accepted` with a `job_id` and a `poll_url`. Nothing is charged at this point; credits are taken when the transcript is delivered.
 
 A failure envelope with a code like `no_captions` is only reachable with `mode: "captions"`, or when the input is something AI transcription can never serve.
+
+<a id="sec-the-202-job-envelope" />
 
 ## The 202 job envelope
 
@@ -52,11 +61,15 @@ An explicit `mode: "audio"` request that escalates to a job answers like this:
 
 A 202 produced by the auto path (a caption miss that escalated) reports `data.kind: "transcript"` with `text` and `segments` still `null` instead. Branch on `status` and the presence of `job_id`, never on the data kind or the HTTP code alone.
 
+<a id="sec-polling-the-job" />
+
 ## Polling the job
 
 `GET` the `poll_url` until `status` is no longer `processing`. A still-running job returns **200, not 202**, so branch on `status`, never on the HTTP code.
 
-```http
+HTTP
+
+```text
 GET /api/v2/transcripts/jobs/asr_m3k1x9qz4vb2p7
 ```
 
@@ -96,6 +109,8 @@ Worth knowing:
 - **Delivery can fail on credits.** If your balance runs out between enqueue and completion, the job fails with `insufficient_credits`, but the result stays cached: top up and re-request to claim it.
 - **RapidAPI callers:** every poll is a metered gateway call against your plan, so prefer `callback_url` below. (The API also holds the connection longer for RapidAPI requests, about 90 seconds, precisely to spare you the poll.)
 
+<a id="sec-webhooks-instead-of-polling" />
+
 ## Webhooks instead of polling
 
 Pass `callback_url` (a public https URL) with the request and the finished result is POSTed to it:
@@ -121,11 +136,15 @@ A failed job posts `{ "ok": false, "status": "failed", "job_id": "…", "error":
 - When a signing secret is configured, each delivery carries `X-TranscriptFetch-Signature: sha256=<hex>`, an HMAC-SHA256 of the **exact request body**. Verify it against the raw bytes before parsing.
 - Delivery is retried a few times on failure, and the job stays pollable either way, so a missed webhook is never a lost transcript.
 
+<a id="sec-what-ai-transcription-costs" />
+
 ## What AI transcription costs
 
 Audio transcription is billed by length: **1 credit per started minute of audio, minimum 1 credit**. A short TikTok or Reel (up to 30 seconds) is 1 credit, a 10-minute video is 10, an hour is 60, and the ceiling at the 4-hour audio cap is 240. Caption fetches are always 1 credit regardless of length, and failures are always free.
 
 The completed job's `usage.credits_spent` reports what was actually charged; a 202 carries no `usage` because nothing has been charged yet.
+
+<a id="sec-when-a-retry-would-work" />
 
 ## When a retry would work: `retry_with`
 
@@ -148,6 +167,8 @@ A transcript failure that a *different* request could serve says so in machine-r
 Merge `retry_with` into your original body and send it again; that starts the transcription. When it is absent, a different request would not help: the content has no speech, cannot be reached, is on a platform audio transcription cannot serve, or the failure is transient (5xxx, retry the same request with backoff instead). `retry_with` is only present when the retry would actually be attempted, so it also reflects your balance: an audio transcription your credits cannot cover does not get offered.
 
 `retry_with` is also used by `endpoint_platform_mismatch` (3002), where it names the endpoint that serves the platform you sent, e.g. `{ "endpoint": "/api/v2/transcripts/video" }`.
+
+<a id="sec-opting-out" />
 
 ## Opting out
 

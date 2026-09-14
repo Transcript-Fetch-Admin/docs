@@ -1,0 +1,51 @@
+---
+title: "audio_ineligible · 3004 · HTTP 422"
+description: "Audio transcription cannot run on this input, so mode: \"audio\" (or ai_fallback) has nothing to work on."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "audio_ineligible",
+    "number": 3004,
+    "message": "Audio transcription cannot run on this input, so mode: \"audio\" (or ai_fallback) has nothing to work on.",
+    "docs": "https://transcriptfetch.com/docs/errors/audio_ineligible"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `3xxx · this input cannot be served`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+Audio transcription cannot run on this input, so mode: "audio" (or ai_fallback) has nothing to work on.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- `mode: "audio"` (or `ai_fallback: true`) on an input audio transcription cannot serve: an arbitrary page URL rather than a video or media file.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Send the media's own URL or id.
+- Drop `mode` to let the default path decide; captions are attempted first.
+
+**Retryable?** No, not for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/errors/unsupported_platform) (3001), the same input fails there without an audio mode
+- [no_captions](/errors/no_captions) (4103), the failure that usually precedes an audio retry

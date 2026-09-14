@@ -1,0 +1,52 @@
+---
+title: "no_speech · 4105 · HTTP 422"
+description: "No detectable speech (e.g. music/ambient); nothing to transcribe."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "no_speech",
+    "number": 4105,
+    "message": "No detectable speech (e.g. music/ambient); nothing to transcribe.",
+    "docs": "https://transcriptfetch.com/docs/errors/no_speech"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `4xxx · the media has no transcript to give`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**No speech.** No detectable speech (e.g. music/ambient); nothing to transcribe.
+
+Shown to end users as: “This looks like a music or ambient video, there's no speech to transcribe.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- No speech. No detectable speech (e.g. music/ambient); nothing to transcribe.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: there is no accessible speech to transcribe.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

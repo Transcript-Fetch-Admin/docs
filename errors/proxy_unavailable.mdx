@@ -1,0 +1,54 @@
+---
+title: "proxy_unavailable · 5004 · HTTP 503"
+description: "The upstream egress proxy refused the tunnel (billing, credentials, or exhausted quota). NOT retryable - retrying cannot clear it, and every platform is affected until it is resolved."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "proxy_unavailable",
+    "number": 5004,
+    "message": "The upstream egress proxy refused the tunnel (billing, credentials, or exhausted quota). NOT retryable - retrying cannot clear it, and every platform is affected until it is resolved.",
+    "docs": "https://transcriptfetch.com/docs/errors/proxy_unavailable"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `5xxx · transient, retry with backoff`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Egress proxy unavailable.** The upstream egress proxy refused the tunnel (billing, credentials, or exhausted quota). NOT retryable - retrying cannot clear it, and every platform is affected until it is resolved.
+
+Shown to end users as: “Fetching is temporarily unavailable. This is on our side and we are already aware of it.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Egress proxy unavailable. The upstream egress proxy refused the tunnel (billing, credentials, or exhausted quota). NOT retryable - retrying cannot clear it, and every platform is affected until it is resolved.
+- Transient by definition: the same request may succeed a moment later.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- This is an incident on our side, not a problem with your request. Retrying seconds later cannot clear it; every platform is affected until it is resolved.
+- Retry once the incident is resolved. Failed requests are never charged.
+
+**Retryable?** Not usefully. Retrying cannot clear it; wait until the incident on our side is resolved, then retry. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [upstream_unavailable](/errors/upstream_unavailable) (5101), the service itself, rather than the fetch, was unreachable
+- [rate_limited](/errors/rate_limited) (2101), your own key's limit answers 429, never 503

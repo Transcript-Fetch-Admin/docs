@@ -1,0 +1,51 @@
+---
+title: "v1: internal_error · HTTP 500"
+description: "Unexpected server error. Retry with backoff; if it persists, send support the request_id."
+---
+
+<Warning>Legacy v1 reference. Use [v2 documentation](/quickstart) for new integrations. Shared guides describe the current API.</Warning>
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "internal_error",
+    "message": "Unexpected server error. Retry with backoff; if it persists, send support the request_id."
+  }
+}
+```
+
+v1 failures carry `error.code` and `error.message` (plus `issues` on validation failures); transcript failures repeat the code as a top-level `reason` and add an `ai_fallback` hint.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+Unexpected server error. Retry with backoff; if it persists, send support the request_id.
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- An unexpected server-side failure while processing the request.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Retry once with backoff; most are transient.
+- If it persists, contact support@transcriptfetch.com with the `request_id` from the response so we can trace it.
+
+**Retryable?** Yes, with backoff. Include the request_id when reporting. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [upstream_unavailable](/v1/errors/upstream_unavailable) (5101), a fetch that could not complete is reported as 502
+- [unknown](/v1/errors/unknown) (9002), a transcript fetch that failed without a classifiable reason

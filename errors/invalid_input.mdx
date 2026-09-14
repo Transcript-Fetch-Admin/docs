@@ -1,0 +1,52 @@
+---
+title: "invalid_input · 3005 · HTTP 422"
+description: "The provided video/URL/ID was invalid."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "invalid_input",
+    "number": 3005,
+    "message": "The provided video/URL/ID was invalid.",
+    "docs": "https://transcriptfetch.com/docs/errors/invalid_input"
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `3xxx · this input cannot be served`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+**Invalid input.** The provided video/URL/ID was invalid.
+
+Shown to end users as: “That doesn't look like a valid YouTube link or ID.”
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- Invalid input. The provided video/URL/ID was invalid.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Permanent for this input: the same request will fail the same way, so do not retry unchanged. Failed requests are never charged.
+- AI transcription would not help here: the content itself is not accessible to fetch.
+
+**Retryable?** No, this is permanent for this input. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/errors/unsupported_platform) (3001), an input on a platform we do not serve at all

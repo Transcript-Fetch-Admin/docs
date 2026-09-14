@@ -1,0 +1,53 @@
+---
+title: "endpoint_platform_mismatch · 3002 · HTTP 422"
+description: "The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles)."
+---
+
+<a id="sec-example-response" />
+
+## Example response
+
+```json
+{
+  "ok": false,
+  "request_id": "req_…",
+  "error": {
+    "code": "endpoint_platform_mismatch",
+    "number": 3002,
+    "message": "The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles).",
+    "docs": "https://transcriptfetch.com/docs/errors/endpoint_platform_mismatch",
+    "retry_with": {
+      "endpoint": "/api/v2/transcripts/channel"
+    }
+  }
+}
+```
+
+Every failure carries `error.code`, `error.number`, `error.message` and `error.docs`, plus at most one of `retry_with` (the request change that would succeed), `details` (structured specifics) or `issues` (validation problems). Family: `3xxx · this input cannot be served`.
+
+<a id="sec-what-it-means" />
+
+## What it means
+
+The platform is supported, but not by this endpoint: playlist listing covers YouTube and TikTok only, so an Instagram profile URL sent to /transcripts/playlist lands here. error.retry_with names the endpoint to use (the channel endpoint lists profiles).
+
+<a id="sec-why-it-happens" />
+
+## Why it happens
+
+- An Instagram profile URL was sent to `/transcripts/playlist`. Playlists exist publicly on YouTube and TikTok only.
+
+<a id="sec-what-to-do" />
+
+## What to do
+
+- Send the profile URL to `/transcripts/channel` instead; `error.retry_with.endpoint` names it.
+- Use `/transcripts/playlist` for YouTube and TikTok playlist URLs.
+
+**Retryable?** Only on the endpoint named in `retry_with`. Every error response carries a `request_id`; include it when contacting support.
+
+<a id="sec-related-errors" />
+
+## Related errors
+
+- [unsupported_platform](/errors/unsupported_platform) (3001), a platform no endpoint serves at all
