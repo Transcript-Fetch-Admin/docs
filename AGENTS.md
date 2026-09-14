@@ -6,7 +6,7 @@ This is an isolated, public documentation trial, not the production application.
 - Keep changes in this repository. Never change root DNS or production /docs.
 - Only public content is allowed. Never include API keys or internal sources.
 - docs.json controls Mintlify branding and navigation.
-- Keep trial noindex, the banner, and links to canonical documentation.
+- Keep trial noindex and links to canonical documentation. The owner requested no top banner.
 - Use the existing TranscriptFetch brand palette and Mintlify native components.
 - Keep headings sequential, code fenced, and links valid.
 - API references are public v2 and frozen legacy v1 OpenAPI snapshots.

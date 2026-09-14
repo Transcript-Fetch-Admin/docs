@@ -261,10 +261,6 @@
       "github": "https://github.com/TranscriptFetch"
     }
   },
-  "banner": {
-    "content": "Mintlify trial · Existing documentation remains at [transcriptfetch.com/docs](https://transcriptfetch.com/docs).",
-    "dismissible": false
-  },
   "seo": {
     "metatags": {
       "robots": "noindex, nofollow"
